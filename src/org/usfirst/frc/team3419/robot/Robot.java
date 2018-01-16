@@ -70,8 +70,8 @@ public class Robot extends SampleRobot {
 			mTurn[i].setNeutralMode(NeutralMode.Brake);
 			mTurn[i].setSensorPhase(DriveConstants.Modules.TALON_ENCODER_REVERSED[i]);//commented for non talon
 			mTurn[i].setInverted(DriveConstants.Modules.TALON_TURN_INVERTED[i]); //commented for non talon
-			mTurn[i].config_kP(0, 0.2/*DriveConstants.PID_Constants.ROTATION_P[i]*/, 10);
-			mTurn[i].config_kI(0, 0.002/*DriveConstants.PID_Constants.ROTATION_I[i]*/, 10);
+			mTurn[i].config_kP(0, 0.5/*DriveConstants.PID_Constants.ROTATION_P[i]*/, 10);
+			mTurn[i].config_kI(0, 0.005/*DriveConstants.PID_Constants.ROTATION_I[i]*/, 10);
 			mTurn[i].config_kD(0, DriveConstants.PID_Constants.ROTATION_D[i], 10);
 			mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
 
@@ -86,7 +86,7 @@ public class Robot extends SampleRobot {
 																 * Not sure
 																 * about this
 																 */,
-					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSET[i]));
+					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
 			// Offset needs to be in degrees
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TALON_TURN_INVERTED[i]);
 		}
@@ -114,9 +114,9 @@ public class Robot extends SampleRobot {
 
 	public void operatorControl() {
 		// CrabDrive();
-		//SwerveDrive();
-		// TankDrive();
-		TalonPIDTest();
+		SwerveDrive();
+		//TankDrive();
+		//TalonPIDTest();
 	}
 
 	public void TankDrive() {
@@ -130,7 +130,6 @@ public class Robot extends SampleRobot {
 	 */
 
 	public void CrabDrive() {
-		double intakeSpeed = 0;
 		boolean isIntaking = false;
 		double x;
 		double y;
@@ -203,7 +202,6 @@ public class Robot extends SampleRobot {
 	}
 
 	public void SwerveDrive() {
-		double intakeSpeed = 0;
 		boolean isIntaking = false;
 		while (isOperatorControl() && isEnabled()) {
 			mDriveTrain.enactMovement();
@@ -259,11 +257,11 @@ public class Robot extends SampleRobot {
 				mWheel[i].setAngleTalon(joystickAngle);
 				mWheel[i].setLinearVelocity(linearVelocity);
 			}
-			SmartDashboard.putNumber("angle 0", mTurn[0].getSelectedSensorPosition(0));
-			SmartDashboard.putNumber("angle 1", mTurn[1].getSelectedSensorPosition(0));
-			SmartDashboard.putNumber("angle 2", mTurn[2].getSelectedSensorPosition(0));
-			SmartDashboard.putNumber("angle 3", mTurn[3].getSelectedSensorPosition(0));
-		}
+			SmartDashboard.putNumber("angle 0", mTurn[0].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[0]);
+			SmartDashboard.putNumber("angle 1", mTurn[1].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[1]);
+			SmartDashboard.putNumber("angle 2", mTurn[2].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[2]);
+			SmartDashboard.putNumber("angle 3", mTurn[3].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[3]);
+		}	
 
 	}
 

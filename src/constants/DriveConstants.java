@@ -39,16 +39,18 @@ public class DriveConstants {
 		public static final boolean[]
 				ENCODER_REVERSED = new boolean[] {true, true, true, false},
 				TALON_TURN_INVERTED = new boolean[] /*{true, true, true, false},*/{false, false, false, true},
-				INVERTED = new boolean[] { true, true, true, true },
+				INVERTED = new boolean[] { false, false, false, false },
 				TURN_INVERTED = new boolean[] { false, false, false, true },
-				TALON_ENCODER_REVERSED = new boolean[] { false, false, false, true } ; //last one true
+				TALON_ENCODER_REVERSED = new boolean[] {true, true, true, false};// worked{ false, false, false, true } ; //last one true
 		public static final double[] 
 				/*X_OFF = new double[] { 19.0 / 2.0, 19.0 / 2.0, -19.0 / 2.0, -19.0 / 2.0 },
 				Y_OFF = new double[] { -22.0 / 2.0, 22.0 / 2.0, 22.0 / 2.0, -22.0 / 2.0 };*/
 				X_OFF = new double[] { -19.0 / 2.0, -19.0 / 2.0, 19.0 / 2.0, 19.0 / 2.0 },
 				Y_OFF = new double[] { -22.0 / 2.0, 22.0 / 2.0, 22.0 / 2.0, -22.0 / 2.0 };
 
-		public static final int[] OFFSET = new int[] { -1663, 1237, -1448, 3648 };
+		public static final int[] OFFSETS = new int[] { 3721 , 767, 3402, 2527 };
+//		public static final int[] OFFSETS = new int[] { -1663, 1237, -1448, 3648 };
+		
 	}
 
 
