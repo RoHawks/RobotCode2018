@@ -54,7 +54,7 @@ public class Wheel {
 	public void setLinearVelocity(double pSpeed) {
 		pSpeed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), DriveConstants.MAX_LINEAR_VEL);
 		mDrive.set(ControlMode.PercentOutput, pSpeed);
-		SmartDashboard.putNumber("Linear Speed", pSpeed);
+		SmartDashboard.putNumber("Linear Velocity", pSpeed);
 	}
 
 	public void setAngle(double pAngle) {
