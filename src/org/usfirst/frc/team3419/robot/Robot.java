@@ -68,10 +68,10 @@ public class Robot extends SampleRobot {
 			mTurn[i] = new WPI_TalonSRX(Ports.TURN[i]);
 			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			mTurn[i].setNeutralMode(NeutralMode.Brake);
-			mTurn[i].setSensorPhase(DriveConstants.Modules.TALON_ENCODER_REVERSED[i]);//commented for non talon
-			mTurn[i].setInverted(DriveConstants.Modules.TALON_TURN_INVERTED[i]); //commented for non talon
-			mTurn[i].config_kP(0, 0.5/*DriveConstants.PID_Constants.ROTATION_P[i]*/, 10);
-			mTurn[i].config_kI(0, 0.005/*DriveConstants.PID_Constants.ROTATION_I[i]*/, 10);
+			mTurn[i].setSensorPhase(DriveConstants.Modules.ENCODER_REVERSED[i]);
+			mTurn[i].setInverted(DriveConstants.Modules.TURN_INVERTED[i]);
+			mTurn[i].config_kP(0, DriveConstants.PID_Constants.ROTATION_P[i], 10);
+			mTurn[i].config_kI(0, DriveConstants.PID_Constants.ROTATION_I[i], 10);
 			mTurn[i].config_kD(0, DriveConstants.PID_Constants.ROTATION_D[i], 10);
 			mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
 
@@ -81,14 +81,10 @@ public class Robot extends SampleRobot {
 			mLeft = new WPI_TalonSRX(Ports.LEFT_INTAKE);
 			mRight = new WPI_TalonSRX(Ports.RIGHT_INTAKE);
 
-			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i],
-					DriveConstants.Modules.TALON_ENCODER_REVERSED[i]/*
-																 * Not sure
-																 * about this
-																 */,
+			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
 					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
 			// Offset needs to be in degrees
-			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TALON_TURN_INVERTED[i]);
+			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
 		}
 
 		mNavX = new AHRS(Port.kUSB);
@@ -113,64 +109,12 @@ public class Robot extends SampleRobot {
 	}
 
 	public void operatorControl() {
+		boolean isIntaking = false;
 		// CrabDrive();
-		SwerveDrive();
-		//TankDrive();
-		//TalonPIDTest();
-	}
-
-	public void TankDrive() {
-		while (isOperatorControl() && isEnabled()) {
-			mDriveTrain.driveTank();
-		}
-	}
-
-	/**
-	 * Runs the motors with arcade steering.
-	 */
-
-	public void CrabDrive() {
-		boolean isIntaking = false;
-		double x;
-		double y;
-		double joystickAngle = 0;
 
 		while (isOperatorControl() && isEnabled()) {
-			x = mController.getX(Hand.kLeft);
-			y = -1 * mController.getY(Hand.kLeft);
-
-			double triggerValue = mController.getTriggerAxis(Hand.kRight);
-			double linearVelocity = Math.pow(triggerValue, 2); // Quadratic
-																// velocity
-			SmartDashboard.putNumber("TriggerAxis", triggerValue);
-
-			if (Math.abs(y) >= DriveConstants.MIN_DIRECTION_MAG || Math.abs(x) >= DriveConstants.MIN_DIRECTION_MAG) {
-				joystickAngle = -Math.toDegrees(Math.atan2(y, x)) + 90;
-				joystickAngle = ResourceFunctions.putAngleInRange(joystickAngle); // puts
-																					// angle
-																					// between
-																					// zero
-																					// and
-																					// 360
-				SmartDashboard.putNumber("Joystick angle", joystickAngle);
-				// for (Wheel wheel : mWheel) {
-				// // Max speed is set in the wheel class
-				// wheel.setAngle(joystickAngle);
-				// }
-			}
-			// else{
-			// for (WPI_TalonSRX turn : mTurn){
-			// turn.set(0);
-			// }
-			// }
-
-			for (Wheel wheel : mWheel) {
-				wheel.setLinearVelocity(linearVelocity); // Max speed is set in
-															// the wheel class
-				wheel.setAngle(joystickAngle);
-			}
-
-			// mDriveTrain.enactMovement();
+			SwerveDrive();
+			// TankDrive();
 
 			if (mController.getAButtonReleased()) {
 				isIntaking = !isIntaking;
@@ -178,58 +122,17 @@ public class Robot extends SampleRobot {
 			mRight.set(ControlMode.PercentOutput, isIntaking ? -DriveConstants.RIGHT_INTAKE_SPEED : 0);
 			mLeft.set(ControlMode.PercentOutput, isIntaking ? DriveConstants.LEFT_INTAKE_SPEED : 0);
 
-			if (mController.getBumper(Hand.kLeft)) {
-				for (Wheel wheel : mWheel) {
-					wheel.setTurnSpeedToZero();
-					wheel.setLinearVelocity(0);
-				}
-			}
-
 			SmartDashboard.putNumber("right intake speed", DriveConstants.RIGHT_INTAKE_SPEED);
 			SmartDashboard.putNumber("left intake speed", DriveConstants.LEFT_INTAKE_SPEED);
 
-			SmartDashboard.putNumber("angle 0", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[0].getSelectedSensorPosition(0))));
-			SmartDashboard.putNumber("angle 1", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[1].getSelectedSensorPosition(0))));
-			SmartDashboard.putNumber("angle 2", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[2].getSelectedSensorPosition(0))));
-			SmartDashboard.putNumber("angle 3", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[3].getSelectedSensorPosition(0))));
-
-			Timer.delay(0.005); // wait for a motor update time
-		}
-	}
-
-	public void SwerveDrive() {
-		boolean isIntaking = false;
-		while (isOperatorControl() && isEnabled()) {
-			mDriveTrain.enactMovement();
-
-			if (mController.getAButtonReleased()) {
-				isIntaking = !isIntaking;
-			}
-			mRight.set(ControlMode.PercentOutput, isIntaking ? -DriveConstants.RIGHT_INTAKE_SPEED : 0);
-			mLeft.set(ControlMode.PercentOutput, isIntaking ? DriveConstants.LEFT_INTAKE_SPEED : 0);
-
-			if (mController.getBumper(Hand.kLeft)) {
-				for (Wheel wheel : mWheel) {
-					wheel.setTurnSpeedToZero();
-					wheel.setLinearVelocity(0);
-				}
-			}
-
-			SmartDashboard.putNumber("right intake speed", DriveConstants.RIGHT_INTAKE_SPEED);
-			SmartDashboard.putNumber("left intake speed", DriveConstants.LEFT_INTAKE_SPEED);
-
-			SmartDashboard.putNumber("angle 0", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[0].getSelectedSensorPosition(0))));
-			SmartDashboard.putNumber("angle 1", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[1].getSelectedSensorPosition(0))));
-			SmartDashboard.putNumber("angle 2", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[2].getSelectedSensorPosition(0))));
-			SmartDashboard.putNumber("angle 3", ResourceFunctions
-					.putAngleInRange(ResourceFunctions.tickToAngle(mTurn[3].getSelectedSensorPosition(0))));
+			SmartDashboard.putNumber("angle 0", ResourceFunctions.putAngleInRange(ResourceFunctions
+					.tickToAngle(mTurn[0].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[0])));
+			SmartDashboard.putNumber("angle 1", ResourceFunctions.putAngleInRange(ResourceFunctions
+					.tickToAngle(mTurn[1].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[1])));
+			SmartDashboard.putNumber("angle 2", ResourceFunctions.putAngleInRange(ResourceFunctions
+					.tickToAngle(mTurn[2].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[2])));
+			SmartDashboard.putNumber("angle 3", ResourceFunctions.putAngleInRange(ResourceFunctions
+					.tickToAngle(mTurn[3].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[3])));
 
 			SmartDashboard.putNumber("robot angle", mNavX.getAngle());
 			SmartDashboard.putNumber("NavX temp", mNavX.getTempC());
@@ -238,31 +141,32 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	public void TalonPIDTest() {
-		//double speed = 0.85;
-		double joystickAngle = 0;
-		while (isOperatorControl() && isEnabled()) {
-			for (int i = 0; i < 4; i++) {
-				//mTurn[i].setSelectedSensorPosition(mTurn[i].getSelectedSensorPosition(0) % 4096, 0, 10);
-				double x = mController.getX(Hand.kLeft);
-				double y = -mController.getY(Hand.kLeft);
-				SmartDashboard.putNumber("x-value", x);
-				SmartDashboard.putNumber("y-value", y);
-				if (Math.abs(y) >= DriveConstants.MIN_DIRECTION_MAG || Math.abs(x) >= DriveConstants.MIN_DIRECTION_MAG) {
-					joystickAngle = -Math.toDegrees(Math.atan2(y, x)) + 90;
-					joystickAngle = ResourceFunctions.putAngleInRange(joystickAngle); //puts angle between zero and 360
-				}
-				double triggerValue = mController.getTriggerAxis(Hand.kRight);
-				double linearVelocity = Math.pow(triggerValue, 2);
-				mWheel[i].setAngleTalon(joystickAngle);
-				mWheel[i].setLinearVelocity(linearVelocity);
-			}
-			SmartDashboard.putNumber("angle 0", mTurn[0].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[0]);
-			SmartDashboard.putNumber("angle 1", mTurn[1].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[1]);
-			SmartDashboard.putNumber("angle 2", mTurn[2].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[2]);
-			SmartDashboard.putNumber("angle 3", mTurn[3].getSelectedSensorPosition(0)-DriveConstants.Modules.OFFSETS[3]);
-		}	
+	public void TankDrive() {
+		mDriveTrain.driveTank();
+	}
 
+	/**
+	 * Runs the motors with arcade steering.
+	 */
+
+	public void CrabDrive() {
+		double joystickAngle = 0;
+
+		while (isOperatorControl() && isEnabled()) {
+			double linearVelocity = mDriveTrain.getStickLinearVel();
+			SmartDashboard.putNumber("Linear Velocity", linearVelocity);
+
+			joystickAngle = mDriveTrain.getStickAngle(Hand.kLeft);
+
+			for (Wheel wheel : mWheel) {
+				wheel.set(joystickAngle, linearVelocity); // Max speed is set in
+															// wheel class
+			}
+		}
+	}
+
+	public void SwerveDrive() {
+		mDriveTrain.enactMovement();
 	}
 
 	/**

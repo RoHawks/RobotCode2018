@@ -47,7 +47,7 @@ public class Wheel {
 	 *            magnitude to drive the wheel
 	 */
 	public void set(double angle, double speed) {
-		setAngleTalon(angle);//changed
+		setAngle(angle);
 		setLinearVelocity(speed);
 	}
 
@@ -58,39 +58,7 @@ public class Wheel {
 	}
 
 	public void setAngle(double pAngle) {
-		double speed = proportional(pAngle);
-		mTurn.set(ControlMode.PercentOutput, speed);
-	}
-
-	public void setAngleTalon(double pAngle) {
 		TalonPID(pAngle);
-	}
-
-	private double proportional(double pTarget) {
-		double current = mEncoder.getAngleDegrees();
-		double error = ResourceFunctions.continuousAngleDif(current, 360 - pTarget);// 360
-																					// -
-																					// pTarget
-																					// was
-																					// a
-																					// quick
-																					// fix,
-																					// will
-																					// think
-																					// more
-																					// later
-		if (Math.abs(error) > 90) {
-			mEncoder.setAdd180(!mEncoder.getAdd180());
-			setInverted(!mDrive.getInverted());
-			error = ResourceFunctions.continuousAngleDif(pTarget, mEncoder.getAngleDegrees());
-		}
-		if (Math.abs(error) < 5) {
-			return 0;
-		}
-		SmartDashboard.putNumber("error", error); // Instance variable?
-		double speed = error * NONTALON_P;// Temporary for onboard PID
-		speed = Math.signum(speed) * Math.min(Math.abs(speed), DriveConstants.MAX_TURN_VEL) * (mTurnInverted ? -1 : 1);
-		return speed;
 	}
 
 	private void TalonPID(double pTarget) {
@@ -132,5 +100,33 @@ public class Wheel {
 	public WPI_TalonSRX getTurn() {
 		return mTurn;
 	}
+	
+	/* Methods to run a self written PID (just proportional) on the roborio instead of the Talons
+	 * Requires some constants to be changed
+	 * 
+	
+	public void setAngle(double pAngle) {
+		double speed = proportional(pAngle);
+		mTurn.set(ControlMode.PercentOutput, speed);
+	}
+
+	private double proportional(double pTarget) {
+		double current = mEncoder.getAngleDegrees();
+		double error = ResourceFunctions.continuousAngleDif(pTarget, current/*current, 360 - pTarget///);
+		// 360-pTarget was quick fix, will think more later
+
+		if (Math.abs(error) > 90) {
+			mEncoder.setAdd180(!mEncoder.getAdd180());
+			setInverted(!mDrive.getInverted());
+			error = ResourceFunctions.continuousAngleDif(pTarget, mEncoder.getAngleDegrees());
+		}
+		if (Math.abs(error) < 5) {
+			return 0;
+		}
+		SmartDashboard.putNumber("error", error); // Instance variable?
+		double speed = error * NONTALON_P;// Temporary for onboard PID
+		speed = Math.signum(speed) * Math.min(Math.abs(speed), DriveConstants.MAX_TURN_VEL) * (mTurnInverted ? -1 : 1);
+		return speed;
+}*/
 
 }
