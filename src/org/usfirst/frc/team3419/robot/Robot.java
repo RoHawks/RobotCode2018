@@ -138,7 +138,7 @@ public class Robot extends SampleRobot {
 			SmartDashboard.putNumber("Angle 3", ResourceFunctions.putAngleInRange(ResourceFunctions
 					.tickToAngle(mTurn[3].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[3])));
 
-			SmartDashboard.putNumber("Robot Angle", mNavX.getAngle());
+			SmartDashboard.putNumber("NavX Angle", ResourceFunctions.putAngleInRange(mNavX.getAngle()));
 			SmartDashboard.putNumber("NavX Temp", mNavX.getTempC());
 
 			Timer.delay(0.005); // wait for a motor update time
