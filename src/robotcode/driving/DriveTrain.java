@@ -64,19 +64,17 @@ public class DriveTrain {
 		if (mIsFieldRelative) {
 			robotDirectionAngle = ResourceFunctions.putAngleInRange(joystickAngle - (mNavX.getAngle() % 360));
 		}
-		SmartDashboard.putNumber("left joystick angle", joystickAngle);
-		SmartDashboard.putNumber("NavX angle", mNavX.getAngle() % 360);
-		SmartDashboard.putNumber("robot angle", robotDirectionAngle);
+		
+		SmartDashboard.putNumber("NavX Angle", mNavX.getAngle() % 360);
+		SmartDashboard.putNumber("Robot Angle", robotDirectionAngle);
 		SmartDashboard.putBoolean("Field Relative", mIsFieldRelative);
 
 		double linearSpeed = getStickLinearVel();
-		SmartDashboard.putNumber("linear speed", linearSpeed);
-
 		Vector linearVel = Vector.createPolar(robotDirectionAngle, linearSpeed);
 		mDesiredRobotVel = new Vector(linearVel);
 
 		mDesiredAngularVel = angularVelStick();
-		SmartDashboard.putNumber("angular vel", linearSpeed);
+		SmartDashboard.putNumber("Angular Velocity", mDesiredAngularVel);
 		mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
 
 		for (int i = 0; i < 4; i++) {
@@ -109,7 +107,16 @@ public class DriveTrain {
 		mWheels[2].set(0, leftSpeed);
 		mWheels[3].set(0, rightSpeed);
 	}
+	
+	public void driveCrab(){
+		double linearVelocity = mDriveTrain.getStickLinearVel();
+		double joystickAngle = mDriveTrain.getStickAngle(Hand.kLeft);
 
+		for (Wheel wheel : mWheel) {
+			wheel.set(joystickAngle, linearVelocity); // Max speed is set in wheel class
+		}
+	}
+	
 	/**
 	 * Gets the angle of Xbox controller joystick
 	 * 
@@ -118,7 +125,7 @@ public class DriveTrain {
 	 * @return Angle of the stick in degrees, with 0 degrees pointing directly
 	 *         up on the controller
 	 */
-	public double getStickAngle(Hand h) {
+	public double getStickAngle(Hand h) { //add if statements to figure out which hand for logging
 		double x = mController.getX(h);
 		double y = -mController.getY(h);
 		SmartDashboard.putNumber("x-value", x);
@@ -128,6 +135,7 @@ public class DriveTrain {
 			mJoystickAngle = ResourceFunctions.putAngleInRange(mJoystickAngle);
 			//puts angle between zero and 360
 		}
+		SmartDashboard.putNumber("Joystick Angle", mJoystickAngle);
 		return mJoystickAngle;
 	}
 
@@ -208,7 +216,7 @@ public class DriveTrain {
 	 */
 	private double angularVelStick() {
 		double angularVel = mController.getX(Hand.kRight) * Math.abs(mController.getX(Hand.kRight));
-		SmartDashboard.putNumber("right joystick X", mController.getX(Hand.kRight));
+		SmartDashboard.putNumber("Right Joystick X", mController.getX(Hand.kRight));
 		angularVel *= DriveConstants.SwerveSpeeds.ANGULAR_SPEED_MULT;
 		// angularVel = -angularVel; //correct the sign for clockwise/counter-clockwise
 		return angularVel; // quadratic control for finer movements
