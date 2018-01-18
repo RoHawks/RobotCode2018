@@ -73,13 +73,20 @@ public class DriveTrain {
 
 		mDesiredAngularVel = angularVelStick();
 		SmartDashboard.putNumber("Angular Velocity", mDesiredAngularVel);
+		
 		if(mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)){
 			mDesiredAngularVel = nudgeTurn();
 		}
 		mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
 
 		for (int i = 0; i < 4; i++) {
-			if (Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) {
+			if (linearSpeed < DriveConstants.MIN_LINEAR_VEL) {
+				mWheels[i].set(robotDirectionAngle, 0);
+			} 
+			else {
+				mWheels[i].set(mSwerveDrive.getOutput(i));
+			}
+			/*if (Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) {
 				if (linearSpeed < DriveConstants.MIN_LINEAR_VEL) {
 					mWheels[i].set(robotDirectionAngle, 0);
 				} else {
@@ -88,9 +95,8 @@ public class DriveTrain {
 				}
 			} else {
 				mWheels[i].set(mSwerveDrive.getOutput(i));
-			}
+			}*/	
 		}
-
 	}
 
 	public void driveTank() {
@@ -111,10 +117,9 @@ public class DriveTrain {
 	public void driveCrab() {
 		double linearVelocity = getStickLinearVel();
 		double joystickAngle = getStickAngle(Hand.kLeft);
-
 		for (Wheel wheel : mWheels) {
-			wheel.set(joystickAngle, linearVelocity); // Max speed is set in
-														// wheel class
+			wheel.set(joystickAngle, linearVelocity);
+			// Max speed is set in wheel class
 		}
 	}
 
@@ -126,8 +131,8 @@ public class DriveTrain {
 	 * @return Angle of the stick in degrees, with 0 degrees pointing directly
 	 *         up on the controller
 	 */
-	public double getStickAngle(Hand h) { // add if statements to figure out
-											// which hand for logging
+	public double getStickAngle(Hand h) { 
+		// add if statements to figure out which hand for logging
 		double x = mController.getX(h);
 		double y = -mController.getY(h);
 		SmartDashboard.putNumber("x-value", x);
@@ -184,6 +189,7 @@ public class DriveTrain {
 	//
 	// return driveVec;
 	// }
+	
 	/**
 	 * Angular velocity using nudge bumpers
 	 * 
@@ -193,7 +199,8 @@ public class DriveTrain {
 		double speed = 0;
 		if (mController.getBumper(Hand.kLeft)) {
 			speed = DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
-		} else if (mController.getBumper(Hand.kRight)) {
+		} 
+		else if (mController.getBumper(Hand.kRight)) {
 			speed = -DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
 		}
 
@@ -214,11 +221,16 @@ public class DriveTrain {
 	 * @return angular velocity for swerve drive
 	 */
 	private double angularVelStick() {
-		double angularVel = mController.getX(Hand.kRight) * Math.abs(mController.getX(Hand.kRight));
-		SmartDashboard.putNumber("Right Joystick X", mController.getX(Hand.kRight));
+		double joystickValue = mController.getX(Hand.kRight);
+		SmartDashboard.putNumber("Right Joystick X", joystickValue);
+		
+		if (Math.abs(joystickValue) < DriveConstants.MIN_DIRECTION_MAG) {
+			return 0;	
+		}
+		double angularVel = joystickValue * Math.abs(joystickValue);
 		angularVel *= DriveConstants.SwerveSpeeds.ANGULAR_SPEED_MULT;
-		// angularVel = -angularVel; //correct the sign for
-		// clockwise/counter-clockwise
+		// angularVel = -angularVel; 
+		//correct the sign for clockwise/counter-clockwise
 		return angularVel; // quadratic control for finer movements
 	}
 
