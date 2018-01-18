@@ -62,7 +62,7 @@ public class DriveTrain {
 		}
 
 		if (mIsFieldRelative) {
-			robotDirectionAngle = ResourceFunctions.putAngleInRange(joystickAngle - (mNavX.getAngle() % 360));
+			robotDirectionAngle = ResourceFunctions.putAngleInRange(joystickAngle - ResourceFunctions.putAngleInRange(mNavX.getAngle()));
 		}
 
 		SmartDashboard.putBoolean("Field Relative", mIsFieldRelative);

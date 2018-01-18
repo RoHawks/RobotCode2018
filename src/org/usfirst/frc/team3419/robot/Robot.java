@@ -3,7 +3,6 @@ package org.usfirst.frc.team3419.robot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.SerialPort.Port;
-import edu.wpi.first.wpilibj.Solenoid;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -13,11 +12,9 @@ import com.kauailabs.navx.frc.AHRS;
 
 import constants.DriveConstants;
 import constants.Ports;
-import constants.RunConstants;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -61,9 +58,6 @@ public class Robot extends SampleRobot {
 
 	private AHRS mNavX;
 
-	private Compressor mCompressor;
-	private Solenoid mGrabby;
-
 	public Robot() {
 	}
 
@@ -89,15 +83,8 @@ public class Robot extends SampleRobot {
 
 			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
 					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
-
 			// Offset needs to be in degrees
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
-
-			mCompressor = new Compressor();
-			if (!RunConstants.RUNNING_PNEUMATICS) {
-				mCompressor.stop();
-			}
-//			mGrabby = new Solenoid(0);
 		}
 
 		mNavX = new AHRS(Port.kUSB);
@@ -106,6 +93,17 @@ public class Robot extends SampleRobot {
 
 	}
 
+	/**
+	 * This autonomous (along with the chooser code above) shows how to select
+	 * between different autonomous modes using the dashboard. The sendable
+	 * chooser code works with the Java SmartDashboard. If you prefer the
+	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
+	 * getString line to get the auto name from the text box below the Gyro
+	 *
+	 * You can add additional auto modes by adding additional comparisons to the
+	 * if-else structure below with additional strings. If using the
+	 * SendableChooser make sure to add them to the chooser code above as well.
+	 */
 	@Override
 	public void autonomous() {
 	}
@@ -115,26 +113,12 @@ public class Robot extends SampleRobot {
 	 */
 	public void operatorControl() {
 		boolean isIntaking = false;
-		boolean isCompressing = false;
 
 		while (isOperatorControl() && isEnabled()) {
 			SwerveDrive();
-			// TankDrive();
-			// CrabDrive();
+			//TankDrive();
+			//CrabDrive();
 
-/*			if (mController.getBumperReleased(Hand.kRight)) {
-				isCompressing = !isCompressing;
-			}
-			if (isCompressing && RunConstants.RUNNING_PNEUMATICS) {
-				mCompressor.start();
-			} else {
-				mCompressor.stop();
-			}
-			
-			if(mController.getBumperReleased(Hand.kLeft)){
-				mGrabby.set(!mGrabby.get());
-			}
-			*/
 			if (mController.getAButtonReleased()) {
 				isIntaking = !isIntaking;
 			}
@@ -154,7 +138,8 @@ public class Robot extends SampleRobot {
 			SmartDashboard.putNumber("Angle 3", ResourceFunctions.putAngleInRange(ResourceFunctions
 					.tickToAngle(mTurn[3].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[3])));
 
-			SmartDashboard.putNumber("Robot Angle", mNavX.getAngle() % 360);
+			SmartDashboard.putNumber("NavX Angle", ResourceFunctions.putAngleInRange(mNavX.getAngle()));
+			SmartDashboard.putNumber("NavX Temp", mNavX.getTempC());
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
