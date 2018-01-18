@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import constants.DriveConstants;
-import edu.wpi.first.wpilibj.LocalPositionPIDController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
@@ -54,7 +53,7 @@ public class Wheel {
 	public void setLinearVelocity(double pSpeed) {
 		pSpeed = Math.signum(pSpeed) * Math.min(Math.abs(pSpeed), DriveConstants.MAX_LINEAR_VEL);
 		mDrive.set(ControlMode.PercentOutput, pSpeed);
-		SmartDashboard.putNumber("Linear Speed", pSpeed);
+		SmartDashboard.putNumber("Linear Velocity", pSpeed);
 	}
 
 	public void setAngle(double pAngle) {
@@ -64,7 +63,7 @@ public class Wheel {
 	private void TalonPID(double pTarget) {
 		double current = ResourceFunctions.tickToAngle(mTurn.getSelectedSensorPosition(0));
 		double realCurrent = current - mEncoder.getOffset();
-		realCurrent = mEncoder.getAdd180() ? realCurrent+180 : (realCurrent);
+		realCurrent = mEncoder.getAdd180() ? realCurrent+180 : realCurrent;
 
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 		
@@ -78,13 +77,10 @@ public class Wheel {
 			error = 0;
 		}
 		
-		SmartDashboard.putBoolean("inverted", mDrive.getInverted());
-		SmartDashboard.putNumber("error" + counter % 4, error);
-		
 		counter++;
 		mTurn.set(ControlMode.Position, ResourceFunctions.angleToTick(current + error));
 	}
-
+	
 	public void setTurnSpeedToZero() {
 		mTurn.set(0);
 	}
@@ -106,7 +102,7 @@ public class Wheel {
 	 * 
 	
 	public void setAngle(double pAngle) {
-		double speed = proportional(pAngle);
+		double speed = proportional(	pAngle);
 		mTurn.set(ControlMode.PercentOutput, speed);
 	}
 

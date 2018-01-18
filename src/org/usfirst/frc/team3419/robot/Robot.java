@@ -108,13 +108,16 @@ public class Robot extends SampleRobot {
 	public void autonomous() {
 	}
 
+	/**
+	 * Runs the motors with arcade steering.
+	 */
 	public void operatorControl() {
 		boolean isIntaking = false;
-		// CrabDrive();
 
 		while (isOperatorControl() && isEnabled()) {
 			SwerveDrive();
-			// TankDrive();
+			//TankDrive();
+			//CrabDrive();
 
 			if (mController.getAButtonReleased()) {
 				isIntaking = !isIntaking;
@@ -122,20 +125,21 @@ public class Robot extends SampleRobot {
 			mRight.set(ControlMode.PercentOutput, isIntaking ? -DriveConstants.RIGHT_INTAKE_SPEED : 0);
 			mLeft.set(ControlMode.PercentOutput, isIntaking ? DriveConstants.LEFT_INTAKE_SPEED : 0);
 
-			SmartDashboard.putNumber("right intake speed", DriveConstants.RIGHT_INTAKE_SPEED);
-			SmartDashboard.putNumber("left intake speed", DriveConstants.LEFT_INTAKE_SPEED);
+			SmartDashboard.putNumber("Right Intake Speed", DriveConstants.RIGHT_INTAKE_SPEED);
+			SmartDashboard.putNumber("Left Intake Speed", DriveConstants.LEFT_INTAKE_SPEED);
+			SmartDashboard.putBoolean("Is Intaking", isIntaking);
 
-			SmartDashboard.putNumber("angle 0", ResourceFunctions.putAngleInRange(ResourceFunctions
+			SmartDashboard.putNumber("Angle 0", ResourceFunctions.putAngleInRange(ResourceFunctions
 					.tickToAngle(mTurn[0].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[0])));
-			SmartDashboard.putNumber("angle 1", ResourceFunctions.putAngleInRange(ResourceFunctions
+			SmartDashboard.putNumber("Angle 1", ResourceFunctions.putAngleInRange(ResourceFunctions
 					.tickToAngle(mTurn[1].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[1])));
-			SmartDashboard.putNumber("angle 2", ResourceFunctions.putAngleInRange(ResourceFunctions
+			SmartDashboard.putNumber("Angle 2", ResourceFunctions.putAngleInRange(ResourceFunctions
 					.tickToAngle(mTurn[2].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[2])));
-			SmartDashboard.putNumber("angle 3", ResourceFunctions.putAngleInRange(ResourceFunctions
+			SmartDashboard.putNumber("Angle 3", ResourceFunctions.putAngleInRange(ResourceFunctions
 					.tickToAngle(mTurn[3].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[3])));
 
-			SmartDashboard.putNumber("robot angle", mNavX.getAngle());
-			SmartDashboard.putNumber("NavX temp", mNavX.getTempC());
+			SmartDashboard.putNumber("NavX Angle", ResourceFunctions.putAngleInRange(mNavX.getAngle()));
+			SmartDashboard.putNumber("NavX Temp", mNavX.getTempC());
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
@@ -145,24 +149,8 @@ public class Robot extends SampleRobot {
 		mDriveTrain.driveTank();
 	}
 
-	/**
-	 * Runs the motors with arcade steering.
-	 */
-
 	public void CrabDrive() {
-		double joystickAngle = 0;
-
-		while (isOperatorControl() && isEnabled()) {
-			double linearVelocity = mDriveTrain.getStickLinearVel();
-			SmartDashboard.putNumber("Linear Velocity", linearVelocity);
-
-			joystickAngle = mDriveTrain.getStickAngle(Hand.kLeft);
-
-			for (Wheel wheel : mWheel) {
-				wheel.set(joystickAngle, linearVelocity); // Max speed is set in
-															// wheel class
-			}
-		}
+		mDriveTrain.driveCrab();
 	}
 
 	public void SwerveDrive() {

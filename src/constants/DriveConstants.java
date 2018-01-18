@@ -31,8 +31,11 @@ public class DriveConstants {
 	public static final double EMERGENCY_VOLTAGE = -1, MAX_VOLTAGE_EMERGENCY = 12.0;*/
 
 	public static class SwerveSpeeds {
-		public static final double SPEED_MULT = 1.0, ANGULAR_SPEED_MULT = 1.0,
-				NUDGE_MOVE_SPEED = 0.5, NUDGE_TURN_SPEED = 0.5;
+		public static final double 
+				SPEED_MULT = 1.0,
+				ANGULAR_SPEED_MULT = 1.0,
+				NUDGE_MOVE_SPEED = 0.5,
+				NUDGE_TURN_SPEED = 0.1;
 	}
 
 	public static class Modules{
@@ -56,8 +59,8 @@ public class DriveConstants {
 			MAX_ANGULAR_VELOCITY_COMPENSATE = 2,
 			TIME_AFTER_TURNING_ACTIVATE_MILLIS = 500;
 		public static final double[] 
-				ROTATION_P = new double[] { 0.02, 0.02, 0.02, 0.02 },
-				ROTATION_I = new double[] { 0.00025, 0.0003, 0.00025, 0.00025 },
+				ROTATION_P = new double[] { 0.5, 0.5, 0.5, 0.5 },
+				ROTATION_I = new double[] { 0, 0, 0, 0 },
 				ROTATION_D = new double[] { 0, 0, 0, 0 };
 		
 		public static final int[]
