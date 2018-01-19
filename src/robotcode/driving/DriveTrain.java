@@ -23,6 +23,10 @@ public class DriveTrain {
 
 	private AHRS mNavX;
 
+	private POVMode mPOV;
+	private LinearVelocity mLinearVel;
+	private RotationalVelocity mRotationalVel;
+
 	public DriveTrain(Wheel[] pWheels, XboxController pController, AHRS pNavX) {
 		mWheels = pWheels;
 		mController = pController;
@@ -34,35 +38,40 @@ public class DriveTrain {
 
 		mJoystickAngle = 0;
 		mIsFieldRelative = false;
+
+		mPOV = POVMode.ROBOT_RELATIVE;
+		mLinearVel = LinearVelocity.NORMAL;
+		mRotationalVel = RotationalVelocity.NORMAL;
 	}
 
-	/**
-	 * are all wheels in tolerance range
-	 * 
-	 * @return
-	 */
-	// public boolean getAllWheelsInRange() {
-	// boolean allInRange = true;
-	// for (int i = 0; i < 4; i++) {
-	// if (!mWheels[i].isInRangeNudge())
-	// {
-	// allInRange = false;
-	// }
-	// }
-	//
-	// return allInRange;
-	// }
+	public enum POVMode {
+		FIELD_RELATIVE, ROBOT_RELATIVE
+	}
+
+	public enum LinearVelocity {
+		NORMAL, NUDGE, ANGLE_ONLY, NONE
+	}
+
+	public enum RotationalVelocity {
+		NORMAL, NUDGE, JOYSTICK, NONE
+	}
+
+	public void move() {
+
+	}
 
 	public void enactMovement() {
 		double joystickAngle = getStickAngle(Hand.kLeft);
 		double robotDirectionAngle = joystickAngle;
-
+		
+		
 		if (mController.getStartButtonReleased()) {
 			mIsFieldRelative = !mIsFieldRelative;
 		}
 
 		if (mIsFieldRelative) {
-			robotDirectionAngle = ResourceFunctions.putAngleInRange(joystickAngle - ResourceFunctions.putAngleInRange(mNavX.getAngle()));
+			robotDirectionAngle = ResourceFunctions
+					.putAngleInRange(joystickAngle - ResourceFunctions.putAngleInRange(mNavX.getAngle()));
 		}
 
 		SmartDashboard.putBoolean("Field Relative", mIsFieldRelative);
@@ -73,22 +82,25 @@ public class DriveTrain {
 
 		mDesiredAngularVel = angularVelStick();
 		SmartDashboard.putNumber("Angular Velocity", mDesiredAngularVel);
-		
-		if(mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)){
+
+		if (mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)) {
 			mDesiredAngularVel = nudgeTurn();
 		}
 		mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
 
 		for (int i = 0; i < 4; i++) {
-			if (linearSpeed < DriveConstants.MIN_LINEAR_VEL && Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) {
+			if (linearSpeed < DriveConstants.MIN_LINEAR_VEL	&& Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) {
 				mWheels[i].set(robotDirectionAngle, 0);
-			} 
-			else {
+			} else {
 				mWheels[i].set(mSwerveDrive.getOutput(i));
 			}
 		}
 	}
 
+	/**
+	 * tank drive : right trigger = forward ; left trigger = turn ; right joystick x
+	 * = turn
+	 */
 	public void driveTank() {
 		double forwardVel = mController.getTriggerAxis(Hand.kRight) - mController.getTriggerAxis(Hand.kLeft);
 		forwardVel *= 0.4;
@@ -104,6 +116,9 @@ public class DriveTrain {
 		mWheels[3].set(0, rightSpeed);
 	}
 
+	/**
+	 * i like crabs
+	 */
 	public void driveCrab() {
 		double linearVelocity = getStickLinearVel();
 		double joystickAngle = getStickAngle(Hand.kLeft);
@@ -118,10 +133,10 @@ public class DriveTrain {
 	 * 
 	 * @param h
 	 *            Joystick to get the angle for
-	 * @return Angle of the stick in degrees, with 0 degrees pointing directly
-	 *         up on the controller
+	 * @return Angle of the stick in degrees, with 0 degrees pointing directly up on
+	 *         the controller
 	 */
-	public double getStickAngle(Hand h) { 
+	public double getStickAngle(Hand h) {
 		// add if statements to figure out which hand for logging
 		double x = mController.getX(h);
 		double y = -mController.getY(h);
@@ -148,38 +163,6 @@ public class DriveTrain {
 		return v.getMagnitude();
 	}
 
-	// /**
-	// * Get the direction vector for nudge driving using the letter buttons
-	// * @return correct direction vector
-	// */
-	// private Vector nudgeMove()
-	// {
-	// Vector driveVec = new Vector();
-	// if(mController.getYButton())
-	// {
-	// driveVec = Vector.createPolar(0,
-	// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
-	// }
-	// else if(mController.getXButton())
-	// {
-	// driveVec = Vector.createPolar(90,
-	// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
-	// }
-	// else if(mController.getAButton())
-	// {
-	// driveVec = Vector.createPolar(180,
-	// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
-	// }
-	// else if(mController.getBButton())
-	// {
-	// driveVec = Vector.createPolar(270,
-	// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
-	// }
-	//
-	//
-	// return driveVec;
-	// }
-	
 	/**
 	 * Angular velocity using nudge bumpers
 	 * 
@@ -189,14 +172,18 @@ public class DriveTrain {
 		double speed = 0;
 		if (mController.getBumper(Hand.kLeft)) {
 			speed = DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
-		} 
-		else if (mController.getBumper(Hand.kRight)) {
+		} else if (mController.getBumper(Hand.kRight)) {
 			speed = -DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
 		}
 
 		return speed;
 	}
 
+	/**
+	 * quadratic control of right trigger axis
+	 * 
+	 * @return trigger axis squared
+	 */
 	public double getStickLinearVel() {
 		double speed = mController.getTriggerAxis(Hand.kRight);
 		SmartDashboard.putNumber("TriggerAxis", speed);
@@ -213,14 +200,56 @@ public class DriveTrain {
 	private double angularVelStick() {
 		double joystickValue = mController.getX(Hand.kRight);
 		SmartDashboard.putNumber("Right Joystick X", joystickValue);
-		
+
 		if (Math.abs(joystickValue) < DriveConstants.MIN_DIRECTION_MAG) {
-			return 0;	
+			return 0;
 		}
 		double angularVel = joystickValue * Math.abs(joystickValue);
 		angularVel *= DriveConstants.SwerveSpeeds.ANGULAR_SPEED_MULT;
-		// angularVel = -angularVel; 	//correct the sign for clockwise/counter-clockwise
+		// angularVel = -angularVel; //correct the sign for clockwise/counter-clockwise
 		return angularVel; // quadratic control for finer movements
+	}
+	private void setPOV(boolean pPOV) {
+		if(pPOV) {
+			mPOV = POVMode.ROBOT_RELATIVE;
+		}else {
+			mPOV = POVMode.FIELD_RELATIVE;
+		}
+	}
+	/**
+	 * gets linear velocity state
+	 * @return bumper --> nudge; no move --> angle only; else --> normal
+	 */
+	//do i need none
+	private LinearVelocity getLinearVelocity() {
+		if (mController.getBButton() || mController.getXButton()) {
+			return LinearVelocity.NUDGE;
+		}
+		else if (getStickLinearVel() < DriveConstants.MIN_LINEAR_VEL/* do i need this && Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG*/) {
+			return LinearVelocity.ANGLE_ONLY;
+		}
+		return LinearVelocity.NORMAL;
+	}
+	/**
+	 * gets rotational velocity state
+	 * @return bumper --> nudge; no move --> none; else --> normal
+	 */
+	//add josytick
+	private RotationalVelocity getRotationalVelocity() {
+		if (mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)) {
+			return RotationalVelocity.NUDGE;
+		}
+		else if (angularVelStick() < DriveConstants.MIN_ANGULAR_VEL) {
+			return RotationalVelocity.NONE;
+		}
+		return RotationalVelocity.NORMAL;
+	}
+	/**
+	 * gets pov of robot
+	 * @return true if robot relative mode
+	 */
+	public boolean getPOV() {
+		return mPOV == POVMode.ROBOT_RELATIVE;
 	}
 
 	public Vector getDesiredRobotVel() {
@@ -231,3 +260,52 @@ public class DriveTrain {
 		return mDesiredAngularVel;
 	}
 }
+
+/// **
+// * are all wheels in tolerance range
+// *
+// * @return
+// */
+// public boolean getAllWheelsInRange() {
+// boolean allInRange = true;
+// for (int i = 0; i < 4; i++) {
+// if (!mWheels[i].isInRangeNudge())
+// {
+// allInRange = false;
+// }
+// }
+//
+// return allInRange;
+// }
+//
+// /**
+// * Get the direction vector for nudge driving using the letter buttons
+// * @return correct direction vector
+// */
+// private Vector nudgeMove()
+// {
+// Vector driveVec = new Vector();
+// if(mController.getYButton())
+// {
+// driveVec = Vector.createPolar(0,
+// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
+// }
+// else if(mController.getXButton())
+// {
+// driveVec = Vector.createPolar(90,
+// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
+// }
+// else if(mController.getAButton())
+// {
+// driveVec = Vector.createPolar(180,
+// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
+// }
+// else if(mController.getBButton())
+// {
+// driveVec = Vector.createPolar(270,
+// DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
+// }
+//
+//
+// return driveVec;
+// }
