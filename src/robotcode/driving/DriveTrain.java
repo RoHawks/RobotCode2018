@@ -214,10 +214,6 @@ public class DriveTrain {
 	private double angularVelStick() {
 		double joystickValue = mController.getX(Hand.kRight);
 		SmartDashboard.putNumber("Right Joystick X", joystickValue);
-		
-		if (Math.abs(joystickValue) < DriveConstants.MIN_DIRECTION_MAG) {
-			return 0;	
-		}
 		double angularVel = joystickValue * Math.abs(joystickValue);
 		angularVel *= DriveConstants.SwerveSpeeds.ANGULAR_SPEED_MULT;
 		// angularVel = -angularVel; 
