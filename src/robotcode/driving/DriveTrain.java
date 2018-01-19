@@ -80,22 +80,13 @@ public class DriveTrain {
 		mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
 
 		for (int i = 0; i < 4; i++) {
-			if (linearSpeed < DriveConstants.MIN_LINEAR_VEL) {
-				mWheels[i].set(robotDirectionAngle, 0);
+			if ((Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) 
+					&& (linearSpeed < DriveConstants.MIN_LINEAR_VEL)) {
+					mWheels[i].set(robotDirectionAngle, 0);
 			} 
 			else {
 				mWheels[i].set(mSwerveDrive.getOutput(i));
 			}
-			/*if (Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) {
-				if (linearSpeed < DriveConstants.MIN_LINEAR_VEL) {
-					mWheels[i].set(robotDirectionAngle, 0);
-				} else {
-					//mWheels[i].set(mDesiredRobotVel);
-					mWheels[i].set(mSwerveDrive.getOutput(i));
-				}
-			} else {
-				mWheels[i].set(mSwerveDrive.getOutput(i));
-			}*/	
 		}
 	}
 
