@@ -18,7 +18,7 @@ public class DriveConstants {
 	public static final double 
 			MAX_ANGULAR_VEL = 0.4,
 			MAX_LINEAR_VEL = 0.3,
-			MAX_TURN_VEL = 0.4;
+			MAX_TURN_VEL = 0.7;
 /*	public static final int MIN_TIME_IN_RANGE_NUDGE_MILLIS = 300;
 	public static final double NUDGE_ANGLE_TOLERANCE = 6;
 
@@ -34,7 +34,7 @@ public class DriveConstants {
 		public static final double 
 				SPEED_MULT = 1.0,
 				ANGULAR_SPEED_MULT = 1.0,
-				NUDGE_MOVE_SPEED = 0.5,
+				NUDGE_MOVE_SPEED = 0.1,
 				NUDGE_TURN_SPEED = 0.1;
 	}
 
