@@ -80,22 +80,12 @@ public class DriveTrain {
 		mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
 
 		for (int i = 0; i < 4; i++) {
-			if (linearSpeed < DriveConstants.MIN_LINEAR_VEL) {
+			if (linearSpeed < DriveConstants.MIN_LINEAR_VEL && Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) {
 				mWheels[i].set(robotDirectionAngle, 0);
 			} 
 			else {
 				mWheels[i].set(mSwerveDrive.getOutput(i));
 			}
-			/*if (Math.abs(mController.getX(Hand.kRight)) < DriveConstants.MIN_DIRECTION_MAG) {
-				if (linearSpeed < DriveConstants.MIN_LINEAR_VEL) {
-					mWheels[i].set(robotDirectionAngle, 0);
-				} else {
-					//mWheels[i].set(mDesiredRobotVel);
-					mWheels[i].set(mSwerveDrive.getOutput(i));
-				}
-			} else {
-				mWheels[i].set(mSwerveDrive.getOutput(i));
-			}*/	
 		}
 	}
 
@@ -229,8 +219,7 @@ public class DriveTrain {
 		}
 		double angularVel = joystickValue * Math.abs(joystickValue);
 		angularVel *= DriveConstants.SwerveSpeeds.ANGULAR_SPEED_MULT;
-		// angularVel = -angularVel; 
-		//correct the sign for clockwise/counter-clockwise
+		// angularVel = -angularVel; 	//correct the sign for clockwise/counter-clockwise
 		return angularVel; // quadratic control for finer movements
 	}
 
