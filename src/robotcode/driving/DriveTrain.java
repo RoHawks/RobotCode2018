@@ -60,10 +60,7 @@ public class DriveTrain {
 	public void enactMovement() {
 		double joystickAngle = getStickAngle(Hand.kLeft);
 		double robotDirectionAngle = joystickAngle;
-		/*
-		 * LinearVelocity linVel = getLinearVelocity(); RotationalVelocity
-		 * rotVel = getRotationalVelocity();
-		 */
+		
 		mLinearVel = getLinearVelocity();
 		mRotationalVel = getRotationalVelocity();
 
@@ -113,10 +110,6 @@ public class DriveTrain {
 			mDesiredAngularVel = 0;
 			break;
 		}
-		SmartDashboard.putNumber("Robot Velocity X", mDesiredRobotVel.getX());
-		SmartDashboard.putNumber("Robot Velocity Y", mDesiredRobotVel.getY());
-		SmartDashboard.putNumber("Angular Velocity", mDesiredAngularVel);
-
 		
 		for (int i = 0; i < 4; i++) {
 			if (mLinearVel == LinearVelocity.ANGLE_ONLY && mRotationalVel == RotationalVelocity.NONE) {

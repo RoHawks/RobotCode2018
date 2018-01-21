@@ -119,7 +119,7 @@ public class Robot extends SampleRobot {
 			//TankDrive();
 			//CrabDrive();
 
-			if (mController.getAButtonReleased()) {
+			if (mController.getBackButtonReleased()) {
 				isIntaking = !isIntaking;
 			}
 			mRight.set(ControlMode.PercentOutput, isIntaking ? -DriveConstants.RIGHT_INTAKE_SPEED : 0);
