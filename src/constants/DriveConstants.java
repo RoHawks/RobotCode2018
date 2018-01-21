@@ -34,8 +34,8 @@ public class DriveConstants {
 		public static final double 
 				SPEED_MULT = 1.0,
 				ANGULAR_SPEED_MULT = 1.0,
-				NUDGE_MOVE_SPEED = 0.2,
-				NUDGE_TURN_SPEED = 0.2;
+				NUDGE_MOVE_SPEED = 0.15,
+				NUDGE_TURN_SPEED = 0.15;
 	}
 
 	public static class Modules{
@@ -67,13 +67,8 @@ public class DriveConstants {
 				ROTATION_IZONE = new int[] { 15, 15, 15, 15 };
 
 		// for turning robot to an angle
-		public static final double 
-				ANGLE_P = 0.025,
-				ANGLE_I = 0.005, 
-				ANGLE_D = 0.04, 
-				ANGLE_IZONE = 5, 
-				ANGLE_MAX = 0.4,
-				ANGLE_MIN = 0.1, 
-				ANGLE_DEADBAND = 2;
+		public static final double
+				GYRO_P = 0.005,
+				GYRO_I = 0.0005;
 		}
 }

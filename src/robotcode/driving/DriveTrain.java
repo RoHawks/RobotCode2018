@@ -50,7 +50,7 @@ public class DriveTrain {
 	}
 
 	public enum RotationalVelocity {
-		NORMAL, NUDGE, NONE /* JOYSTICK, */
+		NORMAL, NUDGE, NONE, POV
 	}
 
 	public void move() {
@@ -60,7 +60,7 @@ public class DriveTrain {
 	public void enactMovement() {
 		double joystickAngle = getStickAngle(Hand.kLeft);
 		double robotDirectionAngle = joystickAngle;
-		
+
 		mLinearVel = getLinearVelocity();
 		mRotationalVel = getRotationalVelocity();
 
@@ -109,16 +109,17 @@ public class DriveTrain {
 			SmartDashboard.putString("Rotational Vel State", "NONE");
 			mDesiredAngularVel = 0;
 			break;
+		case POV:
+			// mDesiredAngularVel
 		}
-		
+
 		for (int i = 0; i < 4; i++) {
 			if (mLinearVel == LinearVelocity.ANGLE_ONLY && mRotationalVel == RotationalVelocity.NONE) {
 				mWheels[i].set(robotDirectionAngle, 0);
 			} else if (mLinearVel == LinearVelocity.NONE && mPrevLinearVel == LinearVelocity.NUDGE
 					&& mRotationalVel == RotationalVelocity.NONE) {
 				mWheels[i].set(mSwerveDrive.getOutput(i).getAngle(), 0);
-			}
-			else if (mRotationalVel == RotationalVelocity.NONE && mLinearVel == LinearVelocity.NONE) {
+			} else if (mRotationalVel == RotationalVelocity.NONE && mLinearVel == LinearVelocity.NONE) {
 				mWheels[i].setDriveSpeed(0);
 				mWheels[i].setTurnSpeed(0);
 			} else {
@@ -201,9 +202,9 @@ public class DriveTrain {
 	 */
 	private double nudgeTurn() {
 		if (mController.getBumper(Hand.kLeft)) {
-			return DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
-		} else if (mController.getBumper(Hand.kRight)) {
 			return -DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
+		} else if (mController.getBumper(Hand.kRight)) {
+			return DriveConstants.SwerveSpeeds.NUDGE_TURN_SPEED;
 		}
 
 		return 0;
@@ -289,7 +290,9 @@ public class DriveTrain {
 	 */
 	// add joystick
 	private RotationalVelocity getRotationalVelocity() {
-		if (mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)) {
+		if (mController.getPOV() >= 0) {
+			return RotationalVelocity.POV;
+		} else if (mController.getBumper(Hand.kRight) || mController.getBumper(Hand.kLeft)) {
 			return RotationalVelocity.NUDGE;
 		} else if (angularVelStick() != 0) {
 			return RotationalVelocity.NORMAL;
@@ -332,9 +335,15 @@ public class DriveTrain {
 			return "NUDGE";
 		case NONE:
 			return "NONE";
+		case POV:
+			return "POV";
 		}
 		return "";
 	}
+
+//	public double getPOVSpeed(double pGoal){
+//		
+//	}
 }
 
 /// **
