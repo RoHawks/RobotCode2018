@@ -139,7 +139,6 @@ public class Robot extends SampleRobot {
 					.tickToAngle(mTurn[3].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[3])));
 
 			SmartDashboard.putNumber("NavX Angle", ResourceFunctions.putAngleInRange(mNavX.getAngle()));
-			SmartDashboard.putNumber("NavX Temp", mNavX.getTempC());
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
