@@ -1,6 +1,9 @@
 package sensors;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import resource.ResourceFunctions;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 public class TalonAbsoluteEncoder extends RotationInputter {
@@ -13,9 +16,16 @@ public class TalonAbsoluteEncoder extends RotationInputter {
 		mTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 	}
 	
-	@Override
-	protected double getRawAngleDegrees() {
-		return mTalon.getSelectedSensorPosition(0) * 360 / 4096;
+	public double getRawAngleDegrees() {
+		return ResourceFunctions.putAngleInRange(mTalon.getSelectedSensorPosition(0) * 360 / 4096 - this.getOffset());
 	}
+	public double getAngleDegrees()
+    {
+		double angle = getRawAngleDegrees();// * (mReversed ? -1 : 1); //Removed this due to multiple things reversing the direction
+		angle = this.getAdd180() ? angle + 180 : angle;
+		angle = ResourceFunctions.putAngleInRange(angle);
+   	 
+   	 	return angle;
+    }
 
 }

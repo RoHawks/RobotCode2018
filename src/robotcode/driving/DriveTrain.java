@@ -66,7 +66,12 @@ public class DriveTrain {
 		NORMAL, NUDGE, NONE, POV
 	}
 
+	public void move() {
+
+	}
+
 	public void enactMovement() {
+		SmartDashboard.putNumber("Robot Angle", mNavX.getAngle());
 		double joystickAngle = getStickAngle(Hand.kLeft);
 		double robotDirectionAngle = joystickAngle;
 
@@ -99,7 +104,7 @@ public class DriveTrain {
 			break;
 		}
 		SmartDashboard.putString("Linear Velocity State", linearVelocityToString(mLinearVel));
-		SmartDashboard.putString("Previous Linear Velocity State", linearVelocityToString(mPrevLinearVel));
+		SmartDashboard.putString("Previous Linear Velocity", linearVelocityToString(mPrevLinearVel));
 		mDesiredRobotVel = new Vector(linearVel);
 
 		switch (mRotationalVel) {
@@ -338,6 +343,7 @@ public class DriveTrain {
 
 		SmartDashboard.putNumber("Gyro PID Setpoint:", mGyroPID.getSetpoint());
 		SmartDashboard.putNumber("Gyro PID Output:", vel);
+		SmartDashboard.putNumber("Gyro PID P:", mGyroPID.getP());
 
 		return vel;
 	}

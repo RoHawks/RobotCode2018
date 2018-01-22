@@ -59,26 +59,24 @@ public class Wheel {
 	public void setAngle(double pAngle) {
 		TalonPID(pAngle);
 	}
-	
+
 	private void TalonPID(double pTarget) {
 		double current = ResourceFunctions.tickToAngle(mTurn.getSelectedSensorPosition(0));
-		double realCurrent = current - mEncoder.getOffset();
-		realCurrent = mEncoder.getAdd180() ? realCurrent + 180 : realCurrent;
+		double realCurrent = mEncoder.getAngleDegrees();
+		SmartDashboard.putNumber("encoder degrees", realCurrent);
 
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 
 		if (Math.abs(error) > 90) {
 			mEncoder.setAdd180(!mEncoder.getAdd180());
 			mDrive.setInverted(!mDrive.getInverted());
-			error = ResourceFunctions.continuousAngleDif(pTarget,
-					ResourceFunctions.putAngleInRange(realCurrent /* + 180 */));
+			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
 		}
 
 		if (Math.abs(error) < 5) {
 			error = 0;
 		}
 
-		counter++;
 		mTurn.set(ControlMode.Position, ResourceFunctions.angleToTick(current + error));
 	}
 
