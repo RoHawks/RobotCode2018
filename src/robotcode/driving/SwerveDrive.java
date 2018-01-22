@@ -52,12 +52,25 @@ public class SwerveDrive {
 		Vector[] velocities = new Vector[4];
 		double maximumLength = 0;
 		for (int i = 0; i < 4; i++) {
-			double angularComponent_angle = mOffsets[i].getAngle() + 90; // angle from center to wheel, +90 for perpendicular
+			double angularComponent_angle = mOffsets[i].getAngle() + 90; // angle
+																			// from
+																			// center
+																			// to
+																			// wheel,
+																			// +90
+																			// for
+																			// perpendicular
 			double angularComponent_speed = mOffsets[i].getMagnitude() * pAngularVelocity;
 
-			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed); 
+			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed);
 			// if we only used these vectors, would only turn
-			Vector velocityComponent = new Vector(pRobotVelocity); // if we only used these vectors, would drive linearly
+			Vector velocityComponent = new Vector(pRobotVelocity); // if we only
+																	// used
+																	// these
+																	// vectors,
+																	// would
+																	// drive
+																	// linearly
 
 			// add two components together
 			velocities[i] = Vector.add(angularComponent, velocityComponent);
@@ -96,12 +109,12 @@ public class SwerveDrive {
 		Vector[] velocities = new Vector[4];
 		double maximumLength = 0;
 		for (int i = 0; i < 4; i++) {
-			double angularComponent_angle = mOffsets[i].getAngle() + 90; 
+			double angularComponent_angle = mOffsets[i].getAngle() + 90;
 			// angle from center to wheel, +90 for perpendicular
 			double angularComponent_speed = mOffsets[i].getMagnitude() * pAngularVelocity;
 
-			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed); 
-			//if we only used these vectors, would only turn
+			Vector angularComponent = Vector.createPolar(angularComponent_angle, angularComponent_speed);
+			// if we only used these vectors, would only turn
 
 			// add two components together
 			fakeVelocities[i] = Vector.add(angularComponent, pRobotVelocity);

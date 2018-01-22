@@ -1,6 +1,5 @@
 package org.usfirst.frc.team3419.robot;
 
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
@@ -12,16 +11,12 @@ import com.kauailabs.navx.frc.AHRS;
 
 import constants.DriveConstants;
 import constants.Ports;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import robotcode.driving.Wheel;
 import robotcode.driving.DriveTrain;
-import robotcode.driving.SwerveDrive;
 import sensors.TalonAbsoluteEncoder;
 
 /**
@@ -57,7 +52,7 @@ public class Robot extends SampleRobot {
 	private WPI_TalonSRX mRight;
 
 	private AHRS mNavX;
-	
+
 	public Robot() {
 	}
 
@@ -116,8 +111,8 @@ public class Robot extends SampleRobot {
 
 		while (isOperatorControl() && isEnabled()) {
 			SwerveDrive();
-			//TankDrive();
-			//CrabDrive();
+			// TankDrive();
+			// CrabDrive();
 
 			if (mController.getBackButtonReleased()) {
 				isIntaking = !isIntaking;

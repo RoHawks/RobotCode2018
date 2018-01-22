@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import constants.DriveConstants;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import resource.Vector;
@@ -15,16 +14,11 @@ public class Wheel {
 	private WPI_TalonSRX mTurn;
 	private WPI_TalonSRX mDrive;
 	private TalonAbsoluteEncoder mEncoder;
-	private boolean mTurnInverted;
-	private int counter = 0;
-
-	private static final double NONTALON_P = 0.1;
 
 	public Wheel(WPI_TalonSRX pTurn, WPI_TalonSRX pDrive, TalonAbsoluteEncoder pEncoder, boolean pTurnInverted) {
 		mTurn = pTurn;
 		mDrive = pDrive;
 		mEncoder = pEncoder;
-		mTurnInverted = pTurnInverted;
 	}
 
 	/**
