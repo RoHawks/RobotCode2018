@@ -3,12 +3,16 @@ package robotcode.driving;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
 
+import constants.Configurables;
 import constants.DriveConstants;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import resource.ResourceFunctions;
 import resource.Vector;
+import robotcode.pid.GenericPIDOutput;
 
 public class DriveTrain {
 	private SwerveDrive mSwerveDrive;
@@ -23,11 +27,13 @@ public class DriveTrain {
 	private boolean mIsFieldRelative;
 
 	private AHRS mNavX;
-
+	private PIDController mGyroPID;
+	private GenericPIDOutput mGyroOutput;
+	
 	private LinearVelocity mLinearVel;
 	private LinearVelocity mPrevLinearVel;
 	private RotationalVelocity mRotationalVel;
-
+	
 	public DriveTrain(Wheel[] pWheels, XboxController pController, AHRS pNavX) {
 		mWheels = pWheels;
 		mController = pController;
@@ -43,6 +49,13 @@ public class DriveTrain {
 		mLinearVel = LinearVelocity.NONE;
 		mPrevLinearVel = LinearVelocity.NONE;
 		mRotationalVel = RotationalVelocity.NONE;
+		
+		mGyroOutput = new GenericPIDOutput();
+		mGyroPID = new PIDController(DriveConstants.PID_Constants.GYRO_P, DriveConstants.PID_Constants.GYRO_I, DriveConstants.PID_Constants.GYRO_D, mNavX, mGyroOutput);
+		mGyroPID.setInputRange(0,  360.0);
+		mGyroPID.setOutputRange(-1.0, 1.0);
+		mGyroPID.setAbsoluteTolerance(DriveConstants.PID_Constants.GYRO_TOLERANCE);
+		mGyroPID.setContinuous(true);
 	}
 
 	public enum LinearVelocity {
@@ -58,6 +71,7 @@ public class DriveTrain {
 	}
 
 	public void enactMovement() {
+		SmartDashboard.putNumber("Robot Angle", mNavX.getAngle());
 		double joystickAngle = getStickAngle(Hand.kLeft);
 		double robotDirectionAngle = joystickAngle;
 
@@ -78,40 +92,40 @@ public class DriveTrain {
 		Vector linearVel = new Vector();
 		switch (mLinearVel) {
 		case NORMAL:
-			SmartDashboard.putString("Linear Vel State", "NORMAL");
 			linearVel = Vector.createPolar(robotDirectionAngle, getStickLinearVel());
 			break;
 		case NUDGE:
-			SmartDashboard.putString("Linear Vel State", "NUDGE");
 			linearVel = nudgeMove();
 			break;
 		case ANGLE_ONLY:
-			SmartDashboard.putString("Linear Vel State", "ANGLE ONLY");
 			// linearVel = Vector.createPolar(robotDirectionAngle, 0);
 			break;
 		case NONE:
-			SmartDashboard.putString("Linear Vel State", "NONE");
 			break;
 		}
+		SmartDashboard.putString("Linear Velocity State", linearVelocityToString(mLinearVel));
 		SmartDashboard.putString("Previous Linear Velocity", linearVelocityToString(mPrevLinearVel));
 		mDesiredRobotVel = new Vector(linearVel);
 
 		switch (mRotationalVel) {
 		case NORMAL:
-			SmartDashboard.putString("Rotational Vel State", "NORMAL");
+			mGyroPID.disable();
 			mDesiredAngularVel = angularVelStick();
 			break;
 		case NUDGE:
-			SmartDashboard.putString("Rotational Vel State", "NUDGE");
+			mGyroPID.disable();
 			mDesiredAngularVel = nudgeTurn();
 			break;
 		case NONE:
-			SmartDashboard.putString("Rotational Vel State", "NONE");
+			mGyroPID.disable();
 			mDesiredAngularVel = 0;
 			break;
 		case POV:
-			// mDesiredAngularVel
+			mDesiredAngularVel = getAngularPIDVel(mController.getPOV());
+			break;
 		}
+		SmartDashboard.putNumber("POV", mController.getPOV());
+		SmartDashboard.putString("Rotational Vel State", rotationalVelocityToString(mRotationalVel));
 
 		for (int i = 0; i < 4; i++) {
 			if (mLinearVel == LinearVelocity.ANGLE_ONLY && mRotationalVel == RotationalVelocity.NONE) {
@@ -304,7 +318,37 @@ public class DriveTrain {
 		return (mController.getAButton() || mController.getBButton() || mController.getXButton()
 				|| mController.getYButton());
 	}
+	
+	/**
+	 * Calculate angular velocity to turn to a certain angle
+	 * 
+	 * @param setpointAngle
+	 *            angle to turn to
+	 * @return angular velocity required to turn to the angle
+	 */
+	public double getAngularPIDVel(double setpointAngle) {
+		mGyroPID.setSetpoint(setpointAngle);
 
+		if (!mGyroPID.isEnabled()) {
+			mGyroPID.enable();
+		}
+
+		// makes sure that the gyro PID has updated before we use it
+	/*	while (mGyroPID_Output.getVal() > Configurables.ERROR_MIN) {
+			Timer.delay(0.005); // this is ugly, should remove; however it shoud
+								// happen very rarey
+		}*/
+
+		double vel = mGyroOutput.getVal();
+
+		SmartDashboard.putNumber("Gyro PID Setpoint:", mGyroPID.getSetpoint());
+		SmartDashboard.putNumber("Gyro PID Output:", vel);
+		SmartDashboard.putNumber("Gyro PID P:", mGyroPID.getP());
+
+		return vel;
+	}
+	
+	
 	public Vector getDesiredRobotVel() {
 		return mDesiredRobotVel;
 	}
@@ -340,10 +384,6 @@ public class DriveTrain {
 		}
 		return "";
 	}
-
-//	public double getPOVSpeed(double pGoal){
-//		
-//	}
 }
 
 /// **

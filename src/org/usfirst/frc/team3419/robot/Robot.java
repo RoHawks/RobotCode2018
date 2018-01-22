@@ -57,7 +57,7 @@ public class Robot extends SampleRobot {
 	private WPI_TalonSRX mRight;
 
 	private AHRS mNavX;
-
+	
 	public Robot() {
 	}
 
