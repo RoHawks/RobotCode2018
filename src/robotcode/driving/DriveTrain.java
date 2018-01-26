@@ -26,11 +26,11 @@ public class DriveTrain {
 	private AHRS mNavX;
 	private PIDController mGyroPID;
 	private GenericPIDOutput mGyroOutput;
-
+	
 	private LinearVelocity mLinearVel;
 	private LinearVelocity mPrevLinearVel;
 	private RotationalVelocity mRotationalVel;
-
+	
 	public DriveTrain(Wheel[] pWheels, XboxController pController, AHRS pNavX) {
 		mWheels = pWheels;
 		mController = pController;
@@ -46,11 +46,10 @@ public class DriveTrain {
 		mLinearVel = LinearVelocity.NONE;
 		mPrevLinearVel = LinearVelocity.NONE;
 		mRotationalVel = RotationalVelocity.NONE;
-
+		
 		mGyroOutput = new GenericPIDOutput();
-		mGyroPID = new PIDController(DriveConstants.PID_Constants.GYRO_P, DriveConstants.PID_Constants.GYRO_I,
-				DriveConstants.PID_Constants.GYRO_D, mNavX, mGyroOutput);
-		mGyroPID.setInputRange(0, 360.0);
+		mGyroPID = new PIDController(DriveConstants.PID_Constants.GYRO_P, DriveConstants.PID_Constants.GYRO_I, DriveConstants.PID_Constants.GYRO_D, mNavX, mGyroOutput);
+		mGyroPID.setInputRange(0,  360.0);
 		mGyroPID.setOutputRange(-1.0, 1.0);
 		mGyroPID.setAbsoluteTolerance(DriveConstants.PID_Constants.GYRO_TOLERANCE);
 		mGyroPID.setContinuous(true);
@@ -229,7 +228,7 @@ public class DriveTrain {
 	 */
 	private Vector nudgeMove() {
 		Vector driveVec = new Vector();
-		if (mIsFieldRelative) {
+		if(mIsFieldRelative){
 			double mRobotAngle = mNavX.getAngle();
 			if (mController.getYButton()) {
 				driveVec = Vector.createPolar(0 - mRobotAngle, DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
@@ -240,7 +239,8 @@ public class DriveTrain {
 			} else if (mController.getBButton()) {
 				driveVec = Vector.createPolar(90 - mRobotAngle, DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
 			}
-		} else {
+		}
+		else {
 			if (mController.getYButton()) {
 				driveVec = Vector.createPolar(0, DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);
 			} else if (mController.getXButton()) {
@@ -329,7 +329,7 @@ public class DriveTrain {
 		return (mController.getAButton() || mController.getBButton() || mController.getXButton()
 				|| mController.getYButton());
 	}
-
+	
 	/**
 	 * Calculate angular velocity to turn to a certain angle
 	 * 
@@ -345,11 +345,10 @@ public class DriveTrain {
 		}
 
 		// makes sure that the gyro PID has updated before we use it
-		/*
-		 * while (mGyroPID_Output.getVal() > Configurables.ERROR_MIN) {
-		 * Timer.delay(0.005); // this is ugly, should remove; however it shoud
-		 * // happen very rarey }
-		 */
+	/*	while (mGyroPID_Output.getVal() > Configurables.ERROR_MIN) {
+			Timer.delay(0.005); // this is ugly, should remove; however it shoud
+								// happen very rarey
+		}*/
 
 		double vel = mGyroOutput.getVal();
 
@@ -359,7 +358,8 @@ public class DriveTrain {
 
 		return vel;
 	}
-
+	
+	
 	public Vector getDesiredRobotVel() {
 		return mDesiredRobotVel;
 	}

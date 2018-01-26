@@ -60,11 +60,11 @@ public class DriveConstants {
 			TIME_AFTER_TURNING_ACTIVATE_MILLIS = 500;
 		public static final double[] 
 				ROTATION_P = new double[] { 0.5, 0.5, 0.5, 0.5 },
-				ROTATION_I = new double[] { 0, 0, 0, 0 },
+				ROTATION_I = new double[] { 0.1, 0.1, 0.1, 0.1 },
 				ROTATION_D = new double[] { 0, 0, 0, 0 };
 		
 		public static final int[]
-				ROTATION_IZONE = new int[] { 15, 15, 15, 15 };
+				ROTATION_IZONE = new int[] { 1, 1, 1, 1 };
 
 		// for turning robot to an angle
 		public static final double

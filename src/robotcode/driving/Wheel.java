@@ -14,7 +14,6 @@ public class Wheel {
 	private WPI_TalonSRX mTurn;
 	private WPI_TalonSRX mDrive;
 	private TalonAbsoluteEncoder mEncoder;
-
 	public Wheel(WPI_TalonSRX pTurn, WPI_TalonSRX pDrive, TalonAbsoluteEncoder pEncoder, boolean pTurnInverted) {
 		mTurn = pTurn;
 		mDrive = pDrive;
@@ -53,7 +52,7 @@ public class Wheel {
 	public void setAngle(double pAngle) {
 		TalonPID(pAngle);
 	}
-
+	
 	private void TalonPID(double pTarget) {
 		double current = ResourceFunctions.tickToAngle(mTurn.getSelectedSensorPosition(0));
 		double realCurrent = mEncoder.getAngleDegrees();

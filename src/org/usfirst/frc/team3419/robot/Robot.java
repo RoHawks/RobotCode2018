@@ -8,7 +8,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
-
 import constants.DriveConstants;
 import constants.Ports;
 import edu.wpi.first.wpilibj.Timer;
@@ -111,8 +110,8 @@ public class Robot extends SampleRobot {
 
 		while (isOperatorControl() && isEnabled()) {
 			SwerveDrive();
-			// TankDrive();
-			// CrabDrive();
+			//TankDrive();
+			//CrabDrive();
 
 			if (mController.getBackButtonReleased()) {
 				isIntaking = !isIntaking;
@@ -124,15 +123,15 @@ public class Robot extends SampleRobot {
 			SmartDashboard.putNumber("Left Intake Speed", DriveConstants.LEFT_INTAKE_SPEED);
 			SmartDashboard.putBoolean("Is Intaking", isIntaking);
 
-			SmartDashboard.putNumber("Angle 0", ResourceFunctions.putAngleInRange(ResourceFunctions
-					.tickToAngle(mTurn[0].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[0])));
-			SmartDashboard.putNumber("Angle 1", ResourceFunctions.putAngleInRange(ResourceFunctions
-					.tickToAngle(mTurn[1].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[1])));
-			SmartDashboard.putNumber("Angle 2", ResourceFunctions.putAngleInRange(ResourceFunctions
-					.tickToAngle(mTurn[2].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[2])));
-			SmartDashboard.putNumber("Angle 3", ResourceFunctions.putAngleInRange(ResourceFunctions
-					.tickToAngle(mTurn[3].getSelectedSensorPosition(0) - DriveConstants.Modules.OFFSETS[3])));
-
+			SmartDashboard.putNumber("Angle 0", mEncoder[0].getAngleDegrees());
+			SmartDashboard.putNumber("Angle 1", mEncoder[1].getAngleDegrees());
+			SmartDashboard.putNumber("Angle 2", mEncoder[2].getAngleDegrees());
+			SmartDashboard.putNumber("Angle 3", mEncoder[3].getAngleDegrees());
+			
+			
+			
+			SmartDashboard.putNumber("X Position", mNavX.getDisplacementX());
+			SmartDashboard.putNumber("Y Position", mNavX.getDisplacementY());
 			SmartDashboard.putNumber("NavX Angle", ResourceFunctions.putAngleInRange(mNavX.getAngle()));
 
 			Timer.delay(0.005); // wait for a motor update time
