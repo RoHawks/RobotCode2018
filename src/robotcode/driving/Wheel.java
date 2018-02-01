@@ -14,6 +14,7 @@ public class Wheel {
 	private WPI_TalonSRX mTurn;
 	private WPI_TalonSRX mDrive;
 	private TalonAbsoluteEncoder mEncoder;
+	
 	public Wheel(WPI_TalonSRX pTurn, WPI_TalonSRX pDrive, TalonAbsoluteEncoder pEncoder, boolean pTurnInverted) {
 		mTurn = pTurn;
 		mDrive = pDrive;
@@ -56,8 +57,7 @@ public class Wheel {
 	private void TalonPID(double pTarget) {
 		double current = ResourceFunctions.tickToAngle(mTurn.getSelectedSensorPosition(0));
 		double realCurrent = mEncoder.getAngleDegrees();
-		SmartDashboard.putNumber("encoder degrees", realCurrent);
-
+		
 		double error = ResourceFunctions.continuousAngleDif(pTarget, ResourceFunctions.putAngleInRange(realCurrent));
 
 		if (Math.abs(error) > 90) {
@@ -66,7 +66,7 @@ public class Wheel {
 			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
 		}
 
-		if (Math.abs(error) < 5) {
+		if (Math.abs(error) < 1) {
 			error = 0;
 		}
 
@@ -77,18 +77,17 @@ public class Wheel {
 		mTurn.set(ControlMode.PercentOutput, pSpeed);
 	}
 
-	public void setDriveSpeed(double pSpeed) {
-		mDrive.set(ControlMode.PercentOutput, pSpeed);
-	}
-
-	public void setInverted(boolean pInverted) {
+	public void setDriveInverted(boolean pInverted) {
 		mDrive.setInverted(pInverted);
 	}
-
-	public WPI_TalonSRX getTurn() {
-		return mTurn;
+	
+	public boolean getDriveInverted(){
+		return mDrive.getInverted();
 	}
 
+	public double getAngle(){
+		return mEncoder.getAngleDegrees();
+	}
 	/*
 	 * Methods to run a self written PID (just proportional) on the roborio
 	 * instead of the Talons Requires some constants to be changed

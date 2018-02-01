@@ -10,10 +10,6 @@ public class DriveConstants {
 			MIN_LINEAR_VEL = 0.02,
 			MIN_DIRECTION_MAG = 0.75, // refers to left joystick magnitude for choosing swerve direction
 			MAX_INDIVIDUAL_VELOCITY = 1.0;
-	
-	public static final double  //Intake wheel speed
-			RIGHT_INTAKE_SPEED = -0.5,
-			LEFT_INTAKE_SPEED = 0.5;
 
 	public static final double 
 			MAX_ANGULAR_VEL = 0.4,
@@ -59,12 +55,12 @@ public class DriveConstants {
 			MAX_ANGULAR_VELOCITY_COMPENSATE = 2,
 			TIME_AFTER_TURNING_ACTIVATE_MILLIS = 500;
 		public static final double[] 
-				ROTATION_P = new double[] { 0.5, 0.5, 0.5, 0.5 },
-				ROTATION_I = new double[] { 0.1, 0.1, 0.1, 0.1 },
+				ROTATION_P = new double[] { 0.7, 0.7, 0.7, 0.7 },
+				ROTATION_I = new double[] { 0.007, 0.007, 0.007, 0.007 },
 				ROTATION_D = new double[] { 0, 0, 0, 0 };
 		
 		public static final int[]
-				ROTATION_IZONE = new int[] { 1, 1, 1, 1 };
+				ROTATION_IZONE = new int[] { 15, 15, 15, 15 };
 
 		// for turning robot to an angle
 		public static final double

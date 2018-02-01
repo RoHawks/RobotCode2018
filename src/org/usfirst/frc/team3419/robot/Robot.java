@@ -1,5 +1,8 @@
 package org.usfirst.frc.team3419.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
@@ -9,12 +12,18 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import constants.DriveConstants;
+import constants.IntakeConstants;
 import constants.Ports;
+import constants.RunConstants;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
 import robotcode.driving.Wheel;
+import robotcode.systems.DoubleSolenoidReal;
+import robotcode.systems.Intake;
+import robotcode.systems.SolenoidInterface;
 import robotcode.driving.DriveTrain;
 import sensors.TalonAbsoluteEncoder;
 
@@ -47,10 +56,19 @@ public class Robot extends SampleRobot {
 	private WPI_TalonSRX[] mDrive = new WPI_TalonSRX[4];
 	private TalonAbsoluteEncoder[] mEncoder = new TalonAbsoluteEncoder[4];
 
-	private WPI_TalonSRX mLeft;
-	private WPI_TalonSRX mRight;
+	private WPI_TalonSRX mIntakeTalon;
+	// private WPI_TalonSRX mRight;
 
 	private AHRS mNavX;
+
+	private PowerDistributionPanel mPDP;
+	private Compressor mCompressor;
+	private boolean mShouldRunCompressor = false;
+	private SolenoidInterface mLeft, mRight;
+
+	private DigitalInput mBreakbeam, mLimitSwitch;
+
+	private Intake mIntake;
 
 	public Robot() {
 	}
@@ -58,7 +76,6 @@ public class Robot extends SampleRobot {
 	@Override
 	public void robotInit() {
 		for (int i = 0; i < 4; i++) {
-
 			mTurn[i] = new WPI_TalonSRX(Ports.TURN[i]);
 			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			mTurn[i].setNeutralMode(NeutralMode.Brake);
@@ -72,19 +89,25 @@ public class Robot extends SampleRobot {
 			mDrive[i] = new WPI_TalonSRX(Ports.DRIVE[i]);
 			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
 
-			mLeft = new WPI_TalonSRX(Ports.LEFT_INTAKE);
-			mRight = new WPI_TalonSRX(Ports.RIGHT_INTAKE);
-
 			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
 					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
 			// Offset needs to be in degrees
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
 		}
+		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 
 		mNavX = new AHRS(Port.kUSB);
 
 		mDriveTrain = new DriveTrain(mWheel, mController, mNavX);
+		mCompressor = new Compressor(0); // everything will be deleted eventually
+										// life is meaningless
 
+		mLimitSwitch = new DigitalInput(Ports.LIMITSWITCH);
+		mBreakbeam = new DigitalInput(Ports.BREAKBEAM);
+		mLeft = new DoubleSolenoidReal(Ports.LEFT_INTAKE_IN, Ports.LEFT_INTAKE_OUT);
+		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
+
+		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mBreakbeam, mLimitSwitch);
 	}
 
 	/**
@@ -109,30 +132,30 @@ public class Robot extends SampleRobot {
 		boolean isIntaking = false;
 
 		while (isOperatorControl() && isEnabled()) {
-			SwerveDrive();
-			//TankDrive();
-			//CrabDrive();
+			PneumaticsTest();
+			// SwerveDrive();
+			// TankDrive();
+			// CrabDrive();
 
 			if (mController.getBackButtonReleased()) {
 				isIntaking = !isIntaking;
 			}
-			mRight.set(ControlMode.PercentOutput, isIntaking ? -DriveConstants.RIGHT_INTAKE_SPEED : 0);
-			mLeft.set(ControlMode.PercentOutput, isIntaking ? DriveConstants.LEFT_INTAKE_SPEED : 0);
+			mIntakeTalon.set(ControlMode.PercentOutput, isIntaking ? IntakeConstants.INTAKE_SPEED : 0);
 
-			SmartDashboard.putNumber("Right Intake Speed", DriveConstants.RIGHT_INTAKE_SPEED);
-			SmartDashboard.putNumber("Left Intake Speed", DriveConstants.LEFT_INTAKE_SPEED);
-			SmartDashboard.putBoolean("Is Intaking", isIntaking);
+			mShouldRunCompressor = mController.getTriggerAxis(Hand.kLeft) > 0.5 ? true : false;
 
+//			if (mCompressor.enabled() && !mShouldRunCompressor) {
+//				mCompressor.stop();
+//			}
+//			if (!mCompressor.enabled() && mShouldRunCompressor) {
+//				mCompressor.start();
+//			}
+			mCompressor.start();
+			
 			SmartDashboard.putNumber("Angle 0", mEncoder[0].getAngleDegrees());
 			SmartDashboard.putNumber("Angle 1", mEncoder[1].getAngleDegrees());
 			SmartDashboard.putNumber("Angle 2", mEncoder[2].getAngleDegrees());
 			SmartDashboard.putNumber("Angle 3", mEncoder[3].getAngleDegrees());
-			
-			
-			
-			SmartDashboard.putNumber("X Position", mNavX.getDisplacementX());
-			SmartDashboard.putNumber("Y Position", mNavX.getDisplacementY());
-			SmartDashboard.putNumber("NavX Angle", ResourceFunctions.putAngleInRange(mNavX.getAngle()));
 
 			Timer.delay(0.005); // wait for a motor update time
 		}
@@ -147,7 +170,25 @@ public class Robot extends SampleRobot {
 	}
 
 	public void SwerveDrive() {
-		mDriveTrain.enactMovement();
+		mDriveTrain.driveSwerve();
+	}
+
+	public void PneumaticsTest() {
+		if (mController.getAButtonReleased()) {
+			mLeft.set(IntakeConstants.LEFT_CLOSED);
+			mRight.set(IntakeConstants.RIGHT_CLOSED);
+		} else if (mController.getYButtonReleased()) {
+			mLeft.set(IntakeConstants.LEFT_OPEN);
+			mRight.set(IntakeConstants.RIGHT_OPEN);
+		} else if (mController.getXButtonReleased()) {
+			mLeft.set(mLeft.get().equals(IntakeConstants.LEFT_CLOSED) ? IntakeConstants.LEFT_OPEN
+					: IntakeConstants.LEFT_CLOSED);
+		} else if (mController.getBButtonReleased()) {
+			mRight.set(mRight.get().equals(IntakeConstants.RIGHT_CLOSED) ? IntakeConstants.RIGHT_OPEN
+					: IntakeConstants.RIGHT_CLOSED);
+		}
+		SmartDashboard.putString("Right", mRight.get().toString());
+		SmartDashboard.putString("Left", mLeft.get().toString());
 	}
 
 	/**
