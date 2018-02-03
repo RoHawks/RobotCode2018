@@ -5,10 +5,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 public class IntakeConstants {
 	//pneumatic states
 	public static final Value
-		LEFT_OPEN = Value.kReverse,
-		LEFT_CLOSED = Value.kForward,
-		RIGHT_OPEN = Value.kReverse,
-		RIGHT_CLOSED = Value.kForward;
+		OPEN = Value.kReverse,
+		CLOSED = Value.kForward;
 	
 	
 	//break beam normally open or closed
@@ -24,5 +22,5 @@ public class IntakeConstants {
 		WAIT_AFTER_BUMPSWITCH = 0.2;
 
 	public static final double  //Intake wheel speed
-		INTAKE_SPEED = 0.5;
+		INTAKE_SPEED = -1;
 }

@@ -136,6 +136,7 @@ public class Robot extends SampleRobot {
 
 		while (isOperatorControl() && isEnabled()) {
 //			mCompressor.stop();
+			mCompressor.start();
 			//PneumaticsTest();
 			IntakeTest();
 			SwerveDrive();
@@ -155,7 +156,6 @@ public class Robot extends SampleRobot {
 //			if (!mCompressor.enabled() && mShouldRunCompressor) {
 //				mCompressor.start();
 //			}
-			mCompressor.start();
 			
 			SmartDashboard.putNumber("Angle 0", mEncoder[0].getAngleDegrees());
 			SmartDashboard.putNumber("Angle 1", mEncoder[1].getAngleDegrees());
@@ -183,17 +183,17 @@ public class Robot extends SampleRobot {
 	}
 	public void PneumaticsTest() {
 		if (mController.getAButtonReleased()) {
-			mLeft.set(IntakeConstants.LEFT_CLOSED);
-			mRight.set(IntakeConstants.RIGHT_CLOSED);
+			mLeft.set(IntakeConstants.CLOSED);
+			mRight.set(IntakeConstants.CLOSED);
 		} else if (mController.getYButtonReleased()) {
-			mLeft.set(IntakeConstants.LEFT_OPEN);
-			mRight.set(IntakeConstants.RIGHT_OPEN);
+			mLeft.set(IntakeConstants.OPEN);
+			mRight.set(IntakeConstants.OPEN);
 		} else if (mController.getXButtonReleased()) {
-			mLeft.set(mLeft.get().equals(IntakeConstants.LEFT_CLOSED) ? IntakeConstants.LEFT_OPEN
-					: IntakeConstants.LEFT_CLOSED);
+			mLeft.set(mLeft.get().equals(IntakeConstants.CLOSED) ? IntakeConstants.OPEN
+					: IntakeConstants.CLOSED);
 		} else if (mController.getBButtonReleased()) {
-			mRight.set(mRight.get().equals(IntakeConstants.RIGHT_CLOSED) ? IntakeConstants.RIGHT_OPEN
-					: IntakeConstants.RIGHT_CLOSED);
+			mRight.set(mRight.get().equals(IntakeConstants.CLOSED) ? IntakeConstants.OPEN
+					: IntakeConstants.CLOSED);
 		}
 		SmartDashboard.putString("Right", mRight.get().toString());
 		SmartDashboard.putString("Left", mLeft.get().toString());
