@@ -10,6 +10,7 @@ public class Ports {
 	
 	public static final int LIMITSWITCH = 0, BREAKBEAM = 1;
 	
+	//pistons
 	public static final int
 		LEFT_INTAKE_IN = 6,
 		LEFT_INTAKE_OUT = 7, 

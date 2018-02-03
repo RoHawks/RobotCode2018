@@ -97,8 +97,7 @@ public class Robot extends SampleRobot {
 			// Offset needs to be in degrees
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
 		}
-		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
-
+		
 		mNavX = new AHRS(Port.kUSB);
 
 		mDriveTrain = new DriveTrain(mWheel, mController, mNavX);
@@ -109,6 +108,7 @@ public class Robot extends SampleRobot {
 		mBreakbeam = new DigitalInput(Ports.BREAKBEAM);
 		mLeft = new DoubleSolenoidReal(Ports.LEFT_INTAKE_IN, Ports.LEFT_INTAKE_OUT);
 		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
+		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 
 		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mBreakbeam, mLimitSwitch, mJoystick);
 	}
@@ -140,22 +140,8 @@ public class Robot extends SampleRobot {
 			//PneumaticsTest();
 			IntakeTest();
 			SwerveDrive();
-			// TankDrive();
+			// TankDrive();	
 			// CrabDrive();
-
-//			if (mController.getBackButtonReleased()) {
-//				isIntaking = !isIntaking;
-//			}
-//			mIntakeTalon.set(ControlMode.PercentOutput, isIntaking ? IntakeConstants.INTAKE_SPEED : 0);
-//
-//			mShouldRunCompressor = mController.getTriggerAxis(Hand.kLeft) > 0.5 ? true : false;
-//
-//			if (mCompressor.enabled() && !mShouldRunCompressor) {
-//				mCompressor.stop();
-//			}
-//			if (!mCompressor.enabled() && mShouldRunCompressor) {
-//				mCompressor.start();
-//			}
 			
 			SmartDashboard.putNumber("Angle 0", mEncoder[0].getAngleDegrees());
 			SmartDashboard.putNumber("Angle 1", mEncoder[1].getAngleDegrees());

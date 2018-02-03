@@ -37,9 +37,11 @@ public class Intake {
 	}
 
 	public void enactMovement() {
-		SmartDashboard.putBoolean("Limit Switch", mLimitSwitch.get());
-		
 		getState();
+		
+		SmartDashboard.putBoolean("Limit Switch", mLimitSwitch.get());
+		SmartDashboard.putNumber("Joystick Y", mJoystick.getY());
+		SmartDashboard.putString("Intake State", mIntakeState.toString());
 		
 		if (Math.abs(mJoystick.getY()) > 0.25) {
 			mWheelSpeed = (mJoystick.getY() > 0) ? -1 * IntakeConstants.INTAKE_SPEED : IntakeConstants.INTAKE_SPEED;
@@ -99,13 +101,13 @@ public class Intake {
 		} else if (mJoystick.getRawButton(3)) {
 			state = IntakeState.FLIP_ALT;
 		} else if (mJoystick.getRawButton(1)) {
-			
 			state = IntakeState.CLOSED;
 		} else if (mJoystick.getRawButton(2)) {
 			state = IntakeState.OPEN;
 		} else {
 			state = mIntakeState.OPEN;
 		}
+		
 		if (mIntakeState != state) {
 			mPrevIntakeState = mIntakeState;
 		}
