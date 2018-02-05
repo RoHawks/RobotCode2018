@@ -143,7 +143,8 @@ public class DriveTrain {
 				mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());
 				mWheels[i].set(mSwerveDrive.getOutput(i));
 			}
-			SmartDashboard.putNumber("error: " + i, robotDirectionAngle - mWheels[i].getAngle());
+			SmartDashboard.putNumber("Error " + i, robotDirectionAngle - mWheels[i].getAngle());
+			SmartDashboard.putNumber("Angle " + i, mWheels[i].getAngle());
 		}
 	}
 	
@@ -163,6 +164,10 @@ public class DriveTrain {
 
 		double leftSpeed = forwardVel - angularVel;
 		double rightSpeed = forwardVel + angularVel;
+		
+		SmartDashboard.putNumber("Tank Left Speed", leftSpeed);
+		SmartDashboard.putNumber("Tank Right Speed", rightSpeed);
+			
 
 		mWheels[0].set(0, rightSpeed);
 		mWheels[1].set(0, leftSpeed);
@@ -176,8 +181,9 @@ public class DriveTrain {
 	public void driveCrab() {
 		double linearVelocity = getStickLinearVel();
 		double joystickAngle = getStickAngle(Hand.kLeft);
-		for (Wheel wheel : mWheels) {
-			wheel.set(joystickAngle, linearVelocity);
+		for (int i = 0; i<4; i++) {
+			mWheels[i].set(joystickAngle, linearVelocity);
+			SmartDashboard.putNumber("Angle " + i, mWheels[i].getAngle());
 		}
 	}
 
@@ -238,7 +244,7 @@ public class DriveTrain {
 	 */
 	private Vector nudgeMove() {
 		double newAngle = 0;
-		double mRobotAngle = mNavX.getAngle();
+		double robotAngle = mNavX.getAngle();
 		
 		if (mController.getYButton()) {
 			newAngle = 0;
@@ -254,7 +260,7 @@ public class DriveTrain {
 		}
 
 		if(mIsFieldRelative){
-			newAngle -= mRobotAngle;
+			newAngle -= robotAngle;
 		}
 		
 		return Vector.createPolar(newAngle, DriveConstants.SwerveSpeeds.NUDGE_MOVE_SPEED);

@@ -4,8 +4,6 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.SerialPort.Port;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -45,8 +43,8 @@ import sensors.TalonAbsoluteEncoder;
 @SuppressWarnings("deprecation")
 public class Robot extends SampleRobot {
 
-	private XboxController mController = new XboxController(0);
-	private Joystick mJoystick = new Joystick(1);
+	private XboxController mController = new XboxController(Ports.XBOX);
+	private Joystick mJoystick = new Joystick(Ports.JOYSTICK);
 
 	private DriveTrain mDriveTrain;
 
@@ -73,40 +71,10 @@ public class Robot extends SampleRobot {
 
 	@Override
 	public void robotInit() {
-		for (int i = 0; i < 4; i++) {
-			mTurn[i] = new WPI_TalonSRX(Ports.TURN[i]);
-			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
-			mTurn[i].setNeutralMode(NeutralMode.Brake);
-			mTurn[i].setSensorPhase(DriveConstants.Modules.ENCODER_REVERSED[i]);
-			mTurn[i].setInverted(DriveConstants.Modules.TURN_INVERTED[i]);
-			mTurn[i].config_kP(0, DriveConstants.PID_Constants.ROTATION_P[i], 10);
-			mTurn[i].config_kI(0, DriveConstants.PID_Constants.ROTATION_I[i], 10);
-			mTurn[i].config_kD(0, DriveConstants.PID_Constants.ROTATION_D[i], 10);
-			mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
-
-			mDrive[i] = new WPI_TalonSRX(Ports.DRIVE[i]);
-			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
-
-			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
-					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
-			// Offset needs to be in degrees
-			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
-		}
-		
 		mNavX = new AHRS(Ports.NAVX);
-
-		mDriveTrain = new DriveTrain(mWheel, mController, mNavX);
-		mCompressor = new Compressor(0); // everything will be deleted eventually
-										// life is meaningless
-
-		mLimitSwitch = new DigitalInput(Ports.LIMITSWITCH);
-		mBreakbeam = new DigitalInput(Ports.BREAKBEAM);
-		
-		mLeft = new DoubleSolenoidReal(Ports.LEFT_INTAKE_IN, Ports.LEFT_INTAKE_OUT);
-		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
-		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
-
-		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
+		mCompressor = new Compressor(Ports.COMPRESSOR);
+		DriveInit();
+		IntakeInit();
 	}
 
 	/**
@@ -139,12 +107,7 @@ public class Robot extends SampleRobot {
 			SwerveDrive();
 			// TankDrive();	
 			// CrabDrive();
-			
-			SmartDashboard.putNumber("Angle 0", mEncoder[0].getAngleDegrees());
-			SmartDashboard.putNumber("Angle 1", mEncoder[1].getAngleDegrees());
-			SmartDashboard.putNumber("Angle 2", mEncoder[2].getAngleDegrees());
-			SmartDashboard.putNumber("Angle 3", mEncoder[3].getAngleDegrees());
-		
+
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
@@ -181,9 +144,41 @@ public class Robot extends SampleRobot {
 		SmartDashboard.putString("Right", mRight.get().toString());
 		SmartDashboard.putString("Left", mLeft.get().toString());
 		SmartDashboard.putBoolean("Limit Switch", mLimitSwitch.get());
-//		SmartDashboard.putBoolean("Break Beam", mBreakbeam.get());
+		SmartDashboard.putBoolean("Break Beam", mBreakbeam.get());
 	}
 	
+	
+	public void DriveInit(){
+		for (int i = 0; i < 4; i++) {
+			mTurn[i] = new WPI_TalonSRX(Ports.TURN[i]);
+			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
+			mTurn[i].setNeutralMode(NeutralMode.Brake);
+			mTurn[i].setSensorPhase(DriveConstants.Modules.ENCODER_REVERSED[i]);
+			mTurn[i].setInverted(DriveConstants.Modules.TURN_INVERTED[i]);
+			mTurn[i].config_kP(0, DriveConstants.PID_Constants.ROTATION_P[i], 10);
+			mTurn[i].config_kI(0, DriveConstants.PID_Constants.ROTATION_I[i], 10);
+			mTurn[i].config_kD(0, DriveConstants.PID_Constants.ROTATION_D[i], 10);
+			mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
+
+			mDrive[i] = new WPI_TalonSRX(Ports.DRIVE[i]);
+			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
+
+			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
+					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
+			// Offset needs to be in degrees
+			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
+		}
+		mDriveTrain = new DriveTrain(mWheel, mController, mNavX);
+	}
+	
+	public void IntakeInit(){
+		mLimitSwitch = new DigitalInput(Ports.LIMITSWITCH);
+		mBreakbeam = new DigitalInput(Ports.BREAKBEAM);
+		mLeft = new DoubleSolenoidReal(Ports.LEFT_INTAKE_IN, Ports.LEFT_INTAKE_OUT);
+		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
+		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
+		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
+	}
 	/**
 	 * Runs during test mode
 	 */

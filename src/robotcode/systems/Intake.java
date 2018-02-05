@@ -33,7 +33,7 @@ public class Intake {
 	}
 
 	public enum IntakeState {
-		OPEN, FLIP_SYNCH, FLIP_ALT, CLOSED, FLIP_ALT_SLOW
+		CLOSED, FLIP_ALT, FLIP_ALT_SLOW, FLIP_SYNCH, OPEN 
 	}
 
 	public void enactMovement() {
@@ -107,7 +107,7 @@ public class Intake {
 		IntakeState state;
 		if (mJoystick.getRawButton(2)) {
 			state = IntakeState.OPEN;
-		} else if (mLimitSwitch.get() || mBreakbeam.get()) {
+		} else if (mLimitSwitch.get()/* || !mBreakbeam.get()*/) {
 			state = IntakeState.CLOSED;
 		} else if (mJoystick.getRawButton(3)) {
 			state = IntakeState.FLIP_ALT;
