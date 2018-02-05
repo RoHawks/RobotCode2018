@@ -7,20 +7,19 @@ public class IntakeConstants {
 	public static final Value
 		OPEN = Value.kReverse,
 		CLOSED = Value.kForward;
-	
-	
+
 	//break beam normally open or closed
-	public static final boolean BOX_PRESENT_BREAK_BEAM = false, BOX_PRESENT_LIMIT_SWITCH = true;
+	public static final boolean 
+		BOX_PRESENT_BREAK_BEAM = false, 
+		BOX_PRESENT_LIMIT_SWITCH = true;
 
-	//time to activate pistons
-	public static final double 
-		SNATCHER_TIME_RELEASE_PRESSURE_OPEN = 0.04,
-		SNATCHER_TIME_RELEASE_PRESSURE_CLOSE = 0.12,
-		SNATCHER_TIME_OPEN = 0.3,
-		SNATCHER_TIME_CLOSE = 0.3,
-		WAIT_AFTER_ALIGNED = 0.2,
-		WAIT_AFTER_BUMPSWITCH = 0.2;
+	//time to activate pistons, haven't calculated yet
+	/*public static final double 
+		TIME_RELEASE_PRESSURE_OPEN = 0.04,
+		TIME_RELEASE_PRESSURE_CLOSE = 0.12,
+		TIME_OPEN = 0.3,
+		TIME_CLOSE = 0.3;*/
 
-	public static final double  //Intake wheel speed
-		INTAKE_SPEED = -1;
+	public static final double INTAKE_SPEED = -1; //Intake wheel speed
+		
 }

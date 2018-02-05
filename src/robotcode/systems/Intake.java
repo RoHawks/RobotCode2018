@@ -12,7 +12,7 @@ public class Intake {
 
 	private WPI_TalonSRX mSquishyWheels;
 	private SolenoidInterface mLeftPiston, mRightPiston;
-	private DigitalInput mBreakbeam, mLimitSwitch;
+	private DigitalInput mLimitSwitch, mBreakbeam;
 	private IntakeState mIntakeState;
 	private IntakeState mPrevIntakeState; // if we want to only go into flip
 											// from open/closed from flip
@@ -20,52 +20,53 @@ public class Intake {
 
 	private double mWheelSpeed;
 
-	public Intake(WPI_TalonSRX pWheel, SolenoidInterface pLeft, SolenoidInterface pRight, DigitalInput pBreakbeam,
-			DigitalInput pLimitSwitch, Joystick pJoystick) {
+	public Intake(WPI_TalonSRX pWheel, SolenoidInterface pLeft, SolenoidInterface pRight, DigitalInput pLimitSwitch,
+			DigitalInput pBreakbeam, Joystick pJoystick) {
 		mSquishyWheels = pWheel;
 		mLeftPiston = pLeft;
 		mRightPiston = pRight;
-		mBreakbeam = pBreakbeam;
 		mLimitSwitch = pLimitSwitch;
+		mBreakbeam = pBreakbeam;
 		mJoystick = pJoystick;
 		mIntakeState = IntakeState.CLOSED;
 		mPrevIntakeState = IntakeState.CLOSED;
 	}
 
 	public enum IntakeState {
-		OPEN, FLIP_SYNCH, FLIP_ALT, CLOSED
+		OPEN, FLIP_SYNCH, FLIP_ALT, CLOSED, FLIP_ALT_SLOW
 	}
 
 	public void enactMovement() {
 		getState();
-		
+
 		SmartDashboard.putBoolean("Limit Switch", mLimitSwitch.get());
+		SmartDashboard.putBoolean("Breakbeam", mBreakbeam.get());
 		SmartDashboard.putNumber("Joystick Y", mJoystick.getY());
 		SmartDashboard.putString("Intake State", mIntakeState.toString());
-		
-		if (Math.abs(mJoystick.getY()) > 0.25) {
-			mWheelSpeed = (mJoystick.getY() > 0) ? -1 * IntakeConstants.INTAKE_SPEED : IntakeConstants.INTAKE_SPEED;
-		} else {
-			mWheelSpeed = 0;
-		}
-		
+
+		mWheelSpeed = (Math.abs(mJoystick.getY()) > 0.25)
+				? -Math.signum(mJoystick.getY()) * IntakeConstants.INTAKE_SPEED : 0;
+
 		switch (mIntakeState) {
-		case FLIP_SYNCH:
-			synchMovePistons();
-			break;
-		case FLIP_ALT:
-			altMovePistons();
-			break;
-		case CLOSED:
-			closeMovePistons();
-			break;
-		case OPEN:
-			openMovePistons();
-			break;
-		default:
-			openMovePistons();
+			case FLIP_SYNCH:
+				synchMovePistons();
+				break;
+			case FLIP_ALT:
+				altMovePistons();
+				break;
+			case CLOSED:
+				closeMovePistons();
+				break;
+			case FLIP_ALT_SLOW:
+				altMovePistonsSlow();
+				break;
+			case OPEN:
+				openMovePistons();
+				break;
+			default:
+				openMovePistons();
 		}
-		
+
 		mSquishyWheels.set(mWheelSpeed);
 	}
 
@@ -75,8 +76,8 @@ public class Intake {
 	}
 
 	public void synchMovePistons() {
-		setLeftOpposite();
-		setRightOpposite();
+		setOpposite(mLeftPiston);
+		setOpposite(mRightPiston);
 		Timer.delay(0.05);
 	}
 
@@ -84,8 +85,7 @@ public class Intake {
 		if (!(mLeftPiston.get().equals(mRightPiston.get()))) {
 			synchMovePistons();
 		} else {
-			setRightOpposite();
-			//Timer.delay(0.1);
+			setOpposite(mRightPiston);
 		}
 	}
 
@@ -94,39 +94,42 @@ public class Intake {
 		mRightPiston.set(IntakeConstants.CLOSED);
 	}
 
+	public void altMovePistonsSlow() {
+		if (!(mLeftPiston.get().equals(mRightPiston.get()))) {
+			synchMovePistons();
+		} else {
+			setOpposite(mRightPiston);
+			Timer.delay(0.1); //unclear how long
+		}
+	}
+
 	public void getState() {
 		IntakeState state;
-		if (mLimitSwitch.get()) {
+		if (mJoystick.getRawButton(2)) {
+			state = IntakeState.OPEN;
+		} else if (mLimitSwitch.get() || mBreakbeam.get()) {
 			state = IntakeState.CLOSED;
 		} else if (mJoystick.getRawButton(3)) {
 			state = IntakeState.FLIP_ALT;
 		} else if (mJoystick.getRawButton(1)) {
 			state = IntakeState.CLOSED;
-		} else if (mJoystick.getRawButton(2)) {
-			state = IntakeState.OPEN;
-		} else {
+		} else if (mJoystick.getRawButton(4)) {
+			state = IntakeState.FLIP_ALT_SLOW;
+		} /*else if (!mBreakbeam.get()) {
+			state = IntakeState.FLIP_ALT_SLOW;
+		}*/
+		else {
 			state = mIntakeState.OPEN;
 		}
-		
+
 		if (mIntakeState != state) {
 			mPrevIntakeState = mIntakeState;
 		}
 		mIntakeState = state;
 	}
 
-	public void setState(IntakeState pState) {
-		if (mIntakeState != pState) {
-			mPrevIntakeState = mIntakeState;
-		}
-		mIntakeState = pState;
+	private void setOpposite(SolenoidInterface pPiston) {
+		pPiston.set(pPiston.get().equals(IntakeConstants.OPEN) ? IntakeConstants.CLOSED : IntakeConstants.OPEN);
 	}
 
-	private void setLeftOpposite() {
-		mLeftPiston.set(mLeftPiston.get().equals(IntakeConstants.OPEN) ? IntakeConstants.CLOSED : IntakeConstants.OPEN);
-	}
-
-	private void setRightOpposite() {
-		mRightPiston
-				.set(mRightPiston.get().equals(IntakeConstants.OPEN) ? IntakeConstants.CLOSED : IntakeConstants.OPEN);
-	}
 }

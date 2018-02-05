@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -14,10 +13,8 @@ import com.kauailabs.navx.frc.AHRS;
 import constants.DriveConstants;
 import constants.IntakeConstants;
 import constants.Ports;
-import constants.RunConstants;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import resource.ResourceFunctions;
@@ -59,7 +56,6 @@ public class Robot extends SampleRobot {
 	private TalonAbsoluteEncoder[] mEncoder = new TalonAbsoluteEncoder[4];
 
 	private WPI_TalonSRX mIntakeTalon;
-	// private WPI_TalonSRX mRight;
 
 	private AHRS mNavX;
 
@@ -68,10 +64,9 @@ public class Robot extends SampleRobot {
 //	private boolean mShouldRunCompressor = false;
 	private SolenoidInterface mLeft, mRight;
 
-	private DigitalInput mBreakbeam, mLimitSwitch;
+	private DigitalInput mLimitSwitch, mBreakbeam;
 
 	private Intake mIntake;
-//	private boolean mIntakeOn = mJoystick.getThrottle() > 0.5;
 
 	public Robot() {
 	}
@@ -98,7 +93,7 @@ public class Robot extends SampleRobot {
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
 		}
 		
-		mNavX = new AHRS(Port.kUSB);
+		mNavX = new AHRS(Ports.NAVX);
 
 		mDriveTrain = new DriveTrain(mWheel, mController, mNavX);
 		mCompressor = new Compressor(0); // everything will be deleted eventually
@@ -106,11 +101,12 @@ public class Robot extends SampleRobot {
 
 		mLimitSwitch = new DigitalInput(Ports.LIMITSWITCH);
 		mBreakbeam = new DigitalInput(Ports.BREAKBEAM);
+		
 		mLeft = new DoubleSolenoidReal(Ports.LEFT_INTAKE_IN, Ports.LEFT_INTAKE_OUT);
 		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
 		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 
-		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mBreakbeam, mLimitSwitch, mJoystick);
+		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
 	}
 
 	/**
@@ -126,6 +122,7 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void autonomous() {
+		
 	}
 
 	/**
@@ -136,9 +133,9 @@ public class Robot extends SampleRobot {
 
 		while (isOperatorControl() && isEnabled()) {
 //			mCompressor.stop();
-			mCompressor.start();
+			//mCompressor.start();
 			//PneumaticsTest();
-			IntakeTest();
+			Intake();
 			SwerveDrive();
 			// TankDrive();	
 			// CrabDrive();
@@ -164,7 +161,7 @@ public class Robot extends SampleRobot {
 		mDriveTrain.driveSwerve();
 	}
 	
-	public void IntakeTest() {
+	public void Intake() {
 		mIntake.enactMovement();
 	}
 	public void PneumaticsTest() {
@@ -197,4 +194,5 @@ public class Robot extends SampleRobot {
 	public void disabled() {
 
 	}
+
 }

@@ -13,16 +13,6 @@ public class DriveConstants {
 	public static final double 
 			MAX_ANGULAR_VEL = 0.4,
 			MAX_LINEAR_VEL = 0.3;
-/*	public static final int MIN_TIME_IN_RANGE_NUDGE_MILLIS = 300;
-	public static final double NUDGE_ANGLE_TOLERANCE = 6;
-
-	public static final double MAX_RPS = 9;
-
-	public static final boolean USING_DRIFT_COMP_PID = true;
-
-	public static final double MAX_VOLTAGE = 12.0, VOLTAGE_RAMP_MILLIS = 25;
-
-	public static final double EMERGENCY_VOLTAGE = -1, MAX_VOLTAGE_EMERGENCY = 12.0;*/
 
 	public static class SwerveSpeeds {
 		public static final double 
