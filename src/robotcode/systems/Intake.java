@@ -45,7 +45,7 @@ public class Intake {
 		SmartDashboard.putString("Intake State", mIntakeState.toString());
 
 		mWheelSpeed = (Math.abs(mJoystick.getY()) > 0.25)
-				? -Math.signum(mJoystick.getY()) * IntakeConstants.INTAKE_SPEED : 0;
+				? Math.signum(mJoystick.getY()) * IntakeConstants.INTAKE_SPEED : 0;
 
 		switch (mIntakeState) {
 			case FLIP_SYNCH:
@@ -107,17 +107,18 @@ public class Intake {
 		IntakeState state;
 		if (mJoystick.getRawButton(2)) {
 			state = IntakeState.OPEN;
-		} else if (mLimitSwitch.get()/* || !mBreakbeam.get()*/) {
-			state = IntakeState.CLOSED;
 		} else if (mJoystick.getRawButton(3)) {
 			state = IntakeState.FLIP_ALT;
 		} else if (mJoystick.getRawButton(1)) {
 			state = IntakeState.CLOSED;
 		} else if (mJoystick.getRawButton(4)) {
 			state = IntakeState.FLIP_ALT_SLOW;
-		} /*else if (!mBreakbeam.get()) {
-			state = IntakeState.FLIP_ALT_SLOW;
-		}*/
+		} else if (mLimitSwitch.get() || !mBreakbeam.get()) {
+			state = IntakeState.CLOSED;
+		} /*
+			 * else if (!mBreakbeam.get()) { state = IntakeState.FLIP_ALT_SLOW;
+			 * }
+			 */
 		else {
 			state = mIntakeState.OPEN;
 		}

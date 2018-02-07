@@ -107,9 +107,16 @@ public class Robot extends SampleRobot {
 			SwerveDrive();
 			// TankDrive();	
 			// CrabDrive();
-
+				
 			Timer.delay(0.005); // wait for a motor update time
 		}
+	}
+
+	/**
+	 * Runs during test mode
+	 */
+	@Override
+	public void test() {
 	}
 
 	public void TankDrive() {
@@ -123,10 +130,11 @@ public class Robot extends SampleRobot {
 	public void SwerveDrive() {
 		mDriveTrain.driveSwerve();
 	}
-	
+
 	public void Intake() {
 		mIntake.enactMovement();
 	}
+
 	public void PneumaticsTest() {
 		if (mController.getAButtonReleased()) {
 			mLeft.set(IntakeConstants.CLOSED);
@@ -146,23 +154,25 @@ public class Robot extends SampleRobot {
 		SmartDashboard.putBoolean("Limit Switch", mLimitSwitch.get());
 		SmartDashboard.putBoolean("Break Beam", mBreakbeam.get());
 	}
-	
-	
+
 	public void DriveInit(){
 		for (int i = 0; i < 4; i++) {
 			mTurn[i] = new WPI_TalonSRX(Ports.TURN[i]);
 			mTurn[i].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 			mTurn[i].setNeutralMode(NeutralMode.Brake);
+			
 			mTurn[i].setSensorPhase(DriveConstants.Modules.ENCODER_REVERSED[i]);
 			mTurn[i].setInverted(DriveConstants.Modules.TURN_INVERTED[i]);
+			
 			mTurn[i].config_kP(0, DriveConstants.PID_Constants.ROTATION_P[i], 10);
 			mTurn[i].config_kI(0, DriveConstants.PID_Constants.ROTATION_I[i], 10);
 			mTurn[i].config_kD(0, DriveConstants.PID_Constants.ROTATION_D[i], 10);
 			mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
-
+	
+			
 			mDrive[i] = new WPI_TalonSRX(Ports.DRIVE[i]);
 			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
-
+	
 			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
 					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
 			// Offset needs to be in degrees
@@ -170,7 +180,7 @@ public class Robot extends SampleRobot {
 		}
 		mDriveTrain = new DriveTrain(mWheel, mController, mNavX);
 	}
-	
+
 	public void IntakeInit(){
 		mLimitSwitch = new DigitalInput(Ports.LIMITSWITCH);
 		mBreakbeam = new DigitalInput(Ports.BREAKBEAM);
@@ -178,16 +188,6 @@ public class Robot extends SampleRobot {
 		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
 		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
-	}
-	/**
-	 * Runs during test mode
-	 */
-	@Override
-	public void test() {
-	}
-
-	public void disabled() {
-
 	}
 
 }
