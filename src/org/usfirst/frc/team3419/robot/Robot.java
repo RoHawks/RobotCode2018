@@ -11,6 +11,7 @@ import com.kauailabs.navx.frc.AHRS;
 import constants.DriveConstants;
 import constants.IntakeConstants;
 import constants.Ports;
+import constants.RunConstants;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Joystick;
@@ -63,8 +64,11 @@ public class Robot extends SampleRobot {
 	private SolenoidInterface mLeft, mRight;
 
 	private DigitalInput mLimitSwitch, mBreakbeam;
-
+	
+	private Thread mIntakeThread;
 	private Intake mIntake;
+	
+	private boolean mInGame = false;
 
 	public Robot() {
 	}
@@ -97,21 +101,54 @@ public class Robot extends SampleRobot {
 	 * Runs the motors with arcade steering.
 	 */
 	public void operatorControl() {
-//		boolean isIntaking = false;
-
+		startGame();
 		while (isOperatorControl() && isEnabled()) {
-//			mCompressor.stop();
-			//mCompressor.start();
-			//PneumaticsTest();
+			
 			Intake();
 			SwerveDrive();
 			// TankDrive();	
 			// CrabDrive();
-				
+//			if(mPDP.getVoltage() < DriveConstants.EMERGENCY_VOLTAGE){
+//				for(int i = 0; i < 4; i++){
+//					mTurn[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+//					mTurn[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
+//					
+//					mDrive[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+//					mDrive[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
+//				}
+//			}
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
 
+	public void startGame() {
+		if (!mInGame) {
+			if (RunConstants.RUNNING_INTAKE) {
+				mIntake.enable();
+				mIntakeThread = new Thread(mIntake);
+				mIntakeThread.start();
+			}
+			if (RunConstants.RUNNING_PNEUMATICS) {
+				mCompressor.start();
+			} else {
+				mCompressor.stop();
+			}
+			mInGame = true;
+		}
+	}
+	
+	public void endGame() {
+		if(mInGame){
+			mIntakeThread.interrupt();
+			mInGame = false;
+		}
+	}
+	
+	@Override
+	public void disabled(){
+		endGame();
+	}
+	
 	/**
 	 * Runs during test mode
 	 */
@@ -188,6 +225,9 @@ public class Robot extends SampleRobot {
 		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
 		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
+//		else {
+//			mIntake.disable();		DO I NEED THIS?
+//		}
 	}
 
 }

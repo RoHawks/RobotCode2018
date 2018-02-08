@@ -9,7 +9,11 @@ public class DriveConstants {
 			MIN_LINEAR_VEL = 0.02,
 			MIN_DIRECTION_MAG = 0.75, // refers to left joystick magnitude for choosing swerve direction
 			MAX_INDIVIDUAL_VELOCITY = 1.0;
-
+	
+	public static final double
+			EMERGENCY_VOLTAGE = 10000,
+			MAX_EMERGENCY_VOLTAGE = 0.5;
+	
 	public static final double 
 			MAX_ANGULAR_VEL = 0.4,
 			MAX_LINEAR_VEL = 0.3;

@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Intake {
+public class Intake implements Runnable{
 
 	private WPI_TalonSRX mSquishyWheels;
 	private SolenoidInterface mLeftPiston, mRightPiston;
@@ -19,6 +19,7 @@ public class Intake {
 	private Joystick mJoystick;
 
 	private double mWheelSpeed;
+	private boolean mEnabled = true;
 
 	public Intake(WPI_TalonSRX pWheel, SolenoidInterface pLeft, SolenoidInterface pRight, DigitalInput pLimitSwitch,
 			DigitalInput pBreakbeam, Joystick pJoystick) {
@@ -33,7 +34,7 @@ public class Intake {
 	}
 
 	public enum IntakeState {
-		CLOSED, FLIP_ALT, FLIP_ALT_SLOW, FLIP_SYNCH, OPEN 
+		CLOSED, DISABLE, FLIP_ALT, FLIP_ALT_SLOW, FLIP_SYNCH, OPEN 
 	}
 
 	public void enactMovement() {
@@ -48,6 +49,9 @@ public class Intake {
 				? Math.signum(mJoystick.getY()) * IntakeConstants.INTAKE_SPEED : 0;
 
 		switch (mIntakeState) {
+			case DISABLE:
+				mWheelSpeed = 0;
+				break;
 			case FLIP_SYNCH:
 				synchMovePistons();
 				break;
@@ -105,7 +109,9 @@ public class Intake {
 
 	public void getState() {
 		IntakeState state;
-		if (mJoystick.getRawButton(2)) {
+		if (!mEnabled) {
+			state = IntakeState.DISABLE;
+		} else if (mJoystick.getRawButton(2)) {
 			state = IntakeState.OPEN;
 		} else if (mJoystick.getRawButton(3)) {
 			state = IntakeState.FLIP_ALT;
@@ -113,13 +119,9 @@ public class Intake {
 			state = IntakeState.CLOSED;
 		} else if (mJoystick.getRawButton(4)) {
 			state = IntakeState.FLIP_ALT_SLOW;
-		} else if (mLimitSwitch.get() || !mBreakbeam.get()) {
+		} else if (mLimitSwitch.get()) {
 			state = IntakeState.CLOSED;
-		} /*
-			 * else if (!mBreakbeam.get()) { state = IntakeState.FLIP_ALT_SLOW;
-			 * }
-			 */
-		else {
+		} else {
 			state = mIntakeState.OPEN;
 		}
 
@@ -128,9 +130,27 @@ public class Intake {
 		}
 		mIntakeState = state;
 	}
-
+	
+	public void enable() {
+		mEnabled = true;
+	}
+	
+	public void disable() {
+		mEnabled = false;
+	}
+	
 	private void setOpposite(SolenoidInterface pPiston) {
 		pPiston.set(pPiston.get().equals(IntakeConstants.OPEN) ? IntakeConstants.CLOSED : IntakeConstants.OPEN);
+	}
+
+	@Override
+	public void run() {
+		while(mEnabled && !Thread.interrupted()){
+			enactMovement();
+		}
+		mLeftPiston.set(IntakeConstants.OPEN);
+		mRightPiston.set(IntakeConstants.OPEN);
+		mSquishyWheels.set(0);
 	}
 
 }
