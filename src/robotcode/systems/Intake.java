@@ -34,7 +34,7 @@ public class Intake implements Runnable{
 	}
 
 	public enum IntakeState {
-		CLOSED, DISABLE, FLIP_ALT, FLIP_ALT_SLOW, FLIP_SYNCH, OPEN 
+		CLOSED, DISABLE, FLIP_ALT, FLIP_SYNCH, OPEN 
 	}
 
 	public void enactMovement() {
@@ -44,9 +44,6 @@ public class Intake implements Runnable{
 		SmartDashboard.putBoolean("Breakbeam", mBreakbeam.get());
 		SmartDashboard.putNumber("Joystick Y", mJoystick.getY());
 		SmartDashboard.putString("Intake State", mIntakeState.toString());
-
-		mWheelSpeed = (Math.abs(mJoystick.getY()) > 0.25)
-				? Math.signum(mJoystick.getY()) * IntakeConstants.INTAKE_SPEED : 0;
 
 		switch (mIntakeState) {
 			case DISABLE:
@@ -61,9 +58,6 @@ public class Intake implements Runnable{
 			case CLOSED:
 				closeMovePistons();
 				break;
-			case FLIP_ALT_SLOW:
-				altMovePistonsSlow();
-				break;
 			case OPEN:
 				openMovePistons();
 				break;
@@ -71,18 +65,18 @@ public class Intake implements Runnable{
 				openMovePistons();
 		}
 
-		mSquishyWheels.set(mWheelSpeed);
 	}
 
 	public void openMovePistons() {
 		mLeftPiston.set(IntakeConstants.OPEN);
 		mRightPiston.set(IntakeConstants.OPEN);
+		Timer.delay(0.15);
 	}
 
 	public void synchMovePistons() {
 		setOpposite(mLeftPiston);
 		setOpposite(mRightPiston);
-		Timer.delay(0.05);
+		Timer.delay(0.15);
 	}
 
 	public void altMovePistons() {
@@ -90,21 +84,22 @@ public class Intake implements Runnable{
 			synchMovePistons();
 		} else {
 			setOpposite(mRightPiston);
+			Timer.delay(0.15);
 		}
 	}
 
 	public void closeMovePistons() {
 		mLeftPiston.set(IntakeConstants.CLOSED);
 		mRightPiston.set(IntakeConstants.CLOSED);
+		Timer.delay(0.15);
 	}
-
-	public void altMovePistonsSlow() {
-		if (!(mLeftPiston.get().equals(mRightPiston.get()))) {
-			synchMovePistons();
-		} else {
-			setOpposite(mRightPiston);
-			Timer.delay(0.1); //unclear how long
-		}
+	
+	public void setWheelSpeed() {
+		getSpeed();
+		SmartDashboard.putNumber("Intake Talon Temp", mSquishyWheels.getTemperature());
+		/*mWheelSpeed = (Math.abs(mJoystick.getY()) > 0.25)
+				? Math.signum(mJoystick.getY()) * IntakeConstants.INTAKE_SPEED : 0;*/
+		mSquishyWheels.set(mWheelSpeed);
 	}
 
 	public void getState() {
@@ -117,12 +112,10 @@ public class Intake implements Runnable{
 			state = IntakeState.FLIP_ALT;
 		} else if (mJoystick.getRawButton(1)) {
 			state = IntakeState.CLOSED;
-		} else if (mJoystick.getRawButton(4)) {
-			state = IntakeState.FLIP_ALT_SLOW;
-		} else if (mLimitSwitch.get()) {
+		} else if (!mBreakbeam.get()) {
 			state = IntakeState.CLOSED;
 		} else {
-			state = mIntakeState.OPEN;
+			state = IntakeState.OPEN;
 		}
 
 		if (mIntakeState != state) {
@@ -141,6 +134,11 @@ public class Intake implements Runnable{
 	
 	private void setOpposite(SolenoidInterface pPiston) {
 		pPiston.set(pPiston.get().equals(IntakeConstants.OPEN) ? IntakeConstants.CLOSED : IntakeConstants.OPEN);
+	}
+	
+	private void getSpeed() {
+		double yPos = mJoystick.getY();
+		mWheelSpeed = (Math.abs(yPos) > 0.25) ? (-1 * Math.signum(yPos) * yPos * yPos) : 0;
 	}
 
 	@Override

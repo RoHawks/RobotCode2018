@@ -103,20 +103,21 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 		startGame();
 		while (isOperatorControl() && isEnabled()) {
-			
-			Intake();
+			mCompressor.stop();
+			mIntake.setWheelSpeed();
 			SwerveDrive();
+			SmartDashboard.putNumber("i", mTurn[1].getIntegralAccumulator(0));
 			// TankDrive();	
 			// CrabDrive();
-//			if(mPDP.getVoltage() < DriveConstants.EMERGENCY_VOLTAGE){
-//				for(int i = 0; i < 4; i++){
-//					mTurn[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-//					mTurn[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
-//					
-//					mDrive[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-//					mDrive[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
-//				}
-//			}
+	//			if(mPDP.getVoltage() < DriveConstants.EMERGENCY_VOLTAGE){
+	//				for(int i = 0; i < 4; i++){
+	//					mTurn[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+	//					mTurn[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
+	//					
+	//					mDrive[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+	//					mDrive[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
+	//				}
+	//			}
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
@@ -168,10 +169,6 @@ public class Robot extends SampleRobot {
 		mDriveTrain.driveSwerve();
 	}
 
-	public void Intake() {
-		mIntake.enactMovement();
-	}
-
 	public void PneumaticsTest() {
 		if (mController.getAButtonReleased()) {
 			mLeft.set(IntakeConstants.CLOSED);
@@ -204,8 +201,8 @@ public class Robot extends SampleRobot {
 			mTurn[i].config_kP(0, DriveConstants.PID_Constants.ROTATION_P[i], 10);
 			mTurn[i].config_kI(0, DriveConstants.PID_Constants.ROTATION_I[i], 10);
 			mTurn[i].config_kD(0, DriveConstants.PID_Constants.ROTATION_D[i], 10);
-			mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
-	
+			//mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
+			
 			
 			mDrive[i] = new WPI_TalonSRX(Ports.DRIVE[i]);
 			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
@@ -225,9 +222,8 @@ public class Robot extends SampleRobot {
 		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
 		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
-//		else {
-//			mIntake.disable();		DO I NEED THIS?
-//		}
 	}
+	
+	
 
 }

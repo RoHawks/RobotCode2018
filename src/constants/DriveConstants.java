@@ -15,8 +15,8 @@ public class DriveConstants {
 			MAX_EMERGENCY_VOLTAGE = 0.5;
 	
 	public static final double 
-			MAX_ANGULAR_VEL = 0.4,
-			MAX_LINEAR_VEL = 0.3;
+			MAX_ANGULAR_VEL = 0.5,
+			MAX_LINEAR_VEL = 0.6;
 
 	public static class SwerveSpeeds {
 		public static final double 
@@ -33,8 +33,8 @@ public class DriveConstants {
 				ENCODER_REVERSED = new boolean[] {true, true, true, false};
 		
 		public static final double[] 
-				X_OFF = new double[] { -19.0 / 2.0, -19.0 / 2.0, 19.0 / 2.0, 19.0 / 2.0 },
-				Y_OFF = new double[] { -22.0 / 2.0, 22.0 / 2.0, 22.0 / 2.0, -22.0 / 2.0 };
+				X_OFF = new double[] { -12.0, -12.0 , 12.0 , 12.0 },
+				Y_OFF = new double[] { -11.3, 11.3 , 11.3 , -11.3 };
 
 		public static final int[] OFFSETS = new int[] { 3721 , 767, 3402, 2527 };
 		
@@ -44,8 +44,8 @@ public class DriveConstants {
 	public static class PID_Constants {
 
 		public static final double[] 
-				ROTATION_P = new double[] { 0.7, 0.7, 0.7, 0.7 },
-				ROTATION_I = new double[] { 0.007, 0.007, 0.007, 0.007 },
+				ROTATION_P = new double[] {1.0, 1.0, 1.0, 1.0},//{ 0.91, 0.91, 0.91, 0.91 },
+				ROTATION_I = new double[] {700,700,700,700},//{ 0.023, 0.0025, 0.0025, 0.03 },
 				ROTATION_D = new double[] { 0, 0, 0, 0 };
 		
 		public static final int[]
@@ -53,9 +53,15 @@ public class DriveConstants {
 
 		// for turning robot to an angle
 		public static final double
-				GYRO_P = 0.03,
-				GYRO_I = 0,
+				GYRO_P = 0.0085, //8
+				GYRO_I = 0.0003,
 				GYRO_D = 0,
 				GYRO_TOLERANCE = 5;
+		
+		public static final double
+			DRIFT_COMP_FAST_TARGET_P = 0.02,
+			DRIFT_COMP_FAST_TARGET_I = 0.0002,
+			DRIFT_COMP_FAST_TARGET_MAX = 0.3;
+
 		}
 }
