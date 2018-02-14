@@ -14,8 +14,6 @@ public class Intake implements Runnable{
 	private SolenoidInterface mLeftPiston, mRightPiston;
 	private DigitalInput mLimitSwitch, mBreakbeam;
 	private IntakeState mIntakeState;
-	private IntakeState mPrevIntakeState; // if we want to only go into flip
-											// from open/closed from flip
 	private Joystick mJoystick;
 
 	private double mWheelSpeed;
@@ -30,11 +28,10 @@ public class Intake implements Runnable{
 		mBreakbeam = pBreakbeam;
 		mJoystick = pJoystick;
 		mIntakeState = IntakeState.CLOSED;
-		mPrevIntakeState = IntakeState.CLOSED;
 	}
 
 	public enum IntakeState {
-		CLOSED, DISABLE, FLIP_ALT, FLIP_SYNCH, OPEN 
+		CLOSED, DISABLE, MANUAL_FLIP_ALT, AUTO_FLIP_ALT, FLIP_SYNCH, OPEN 
 	}
 
 	public void enactMovement() {
@@ -52,7 +49,10 @@ public class Intake implements Runnable{
 			case FLIP_SYNCH:
 				synchMovePistons();
 				break;
-			case FLIP_ALT:
+			case AUTO_FLIP_ALT:
+				autoAltMovePistons();
+				break;
+			case MANUAL_FLIP_ALT:
 				altMovePistons();
 				break;
 			case CLOSED:
@@ -87,18 +87,27 @@ public class Intake implements Runnable{
 			Timer.delay(0.15);
 		}
 	}
+	
+	public void autoAltMovePistons() {
+		altMovePistons();
+		setWheelSpeed();
+	}
 
 	public void closeMovePistons() {
 		mLeftPiston.set(IntakeConstants.CLOSED);
 		mRightPiston.set(IntakeConstants.CLOSED);
 		Timer.delay(0.15);
 	}
-	
+
 	public void setWheelSpeed() {
-		getSpeed();
+		double yPos = mJoystick.getY();
+		mWheelSpeed = (Math.abs(yPos) > 0.25) ? (-1 * Math.signum(yPos) * yPos * yPos) : 0;
+		if(mIntakeState == IntakeState.AUTO_FLIP_ALT) {
+			mWheelSpeed = IntakeConstants.INTAKE_SPEED;
+		}
+		SmartDashboard.putNumber("Secondary Joystick Y", yPos);
+		SmartDashboard.putNumber("Intake Wheel Speed", mWheelSpeed);
 		SmartDashboard.putNumber("Intake Talon Temp", mSquishyWheels.getTemperature());
-		/*mWheelSpeed = (Math.abs(mJoystick.getY()) > 0.25)
-				? Math.signum(mJoystick.getY()) * IntakeConstants.INTAKE_SPEED : 0;*/
 		mSquishyWheels.set(mWheelSpeed);
 	}
 
@@ -109,18 +118,20 @@ public class Intake implements Runnable{
 		} else if (mJoystick.getRawButton(2)) {
 			state = IntakeState.OPEN;
 		} else if (mJoystick.getRawButton(3)) {
-			state = IntakeState.FLIP_ALT;
+			state = IntakeState.MANUAL_FLIP_ALT;
 		} else if (mJoystick.getRawButton(1)) {
 			state = IntakeState.CLOSED;
 		} else if (!mBreakbeam.get()) {
 			state = IntakeState.CLOSED;
-		} else {
+		}/*else if (!mBreakbeam.get() && !mLimitSwitch.get()) {
+		}
+			state = IntakeState.AUTO_FLIP_ALT;
+		} else if (mLimitSwitch.get()) {
+			state = IntakeState.CLOSED;
+		}*/ else {
 			state = IntakeState.OPEN;
 		}
 
-		if (mIntakeState != state) {
-			mPrevIntakeState = mIntakeState;
-		}
 		mIntakeState = state;
 	}
 	
@@ -128,19 +139,14 @@ public class Intake implements Runnable{
 		mEnabled = true;
 	}
 	
+	private void setOpposite(SolenoidInterface pPiston) {
+		pPiston.set(pPiston.get().equals(IntakeConstants.OPEN) ? IntakeConstants.CLOSED : IntakeConstants.OPEN);
+	}
+
 	public void disable() {
 		mEnabled = false;
 	}
 	
-	private void setOpposite(SolenoidInterface pPiston) {
-		pPiston.set(pPiston.get().equals(IntakeConstants.OPEN) ? IntakeConstants.CLOSED : IntakeConstants.OPEN);
-	}
-	
-	private void getSpeed() {
-		double yPos = mJoystick.getY();
-		mWheelSpeed = (Math.abs(yPos) > 0.25) ? (-1 * Math.signum(yPos) * yPos * yPos) : 0;
-	}
-
 	@Override
 	public void run() {
 		while(mEnabled && !Thread.interrupted()){

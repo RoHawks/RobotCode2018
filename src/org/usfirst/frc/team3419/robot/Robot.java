@@ -22,6 +22,7 @@ import robotcode.systems.DoubleSolenoidReal;
 import robotcode.systems.Intake;
 import robotcode.systems.SolenoidInterface;
 import robotcode.driving.DriveTrain;
+import sensors.RobotAngle;
 import sensors.TalonAbsoluteEncoder;
 
 /**
@@ -57,7 +58,8 @@ public class Robot extends SampleRobot {
 	private WPI_TalonSRX mIntakeTalon;
 
 	private AHRS mNavX;
-
+	private RobotAngle mRobotAngle;
+	
 	private PowerDistributionPanel mPDP;
 	private Compressor mCompressor;
 //	private boolean mShouldRunCompressor = false;
@@ -103,7 +105,6 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 		startGame();
 		while (isOperatorControl() && isEnabled()) {
-			mCompressor.stop();
 			mIntake.setWheelSpeed();
 			SwerveDrive();
 			SmartDashboard.putNumber("i", mTurn[1].getIntegralAccumulator(0));
@@ -141,6 +142,7 @@ public class Robot extends SampleRobot {
 	public void endGame() {
 		if(mInGame){
 			mIntakeThread.interrupt();
+			mCompressor.stop();
 			mInGame = false;
 		}
 	}
@@ -201,18 +203,20 @@ public class Robot extends SampleRobot {
 			mTurn[i].config_kP(0, DriveConstants.PID_Constants.ROTATION_P[i], 10);
 			mTurn[i].config_kI(0, DriveConstants.PID_Constants.ROTATION_I[i], 10);
 			mTurn[i].config_kD(0, DriveConstants.PID_Constants.ROTATION_D[i], 10);
-			//mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
-			
+			mTurn[i].config_IntegralZone(0, DriveConstants.PID_Constants.ROTATION_IZONE[i], 10);
+			mTurn[i].configAllowableClosedloopError(0, DriveConstants.PID_Constants.ROTATION_TOLERANCE[i], 10);
 			
 			mDrive[i] = new WPI_TalonSRX(Ports.DRIVE[i]);
 			mDrive[i].setInverted(DriveConstants.Modules.INVERTED[i]);
+			mDrive[i].setNeutralMode(NeutralMode.Brake);
 	
 			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
 					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
 			// Offset needs to be in degrees
 			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
 		}
-		mDriveTrain = new DriveTrain(mWheel, mController, mNavX);
+		mRobotAngle = new RobotAngle(mNavX, false, 0);
+		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle);
 	}
 
 	public void IntakeInit(){
@@ -223,7 +227,5 @@ public class Robot extends SampleRobot {
 		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
 	}
-	
-	
 
 }

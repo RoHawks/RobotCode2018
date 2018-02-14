@@ -7,7 +7,7 @@ public class DriveConstants {
 			MIN_ANGULAR_VEL = 0.01,
 			MIN_ANGULAR_VEL_STICK = 0.2, 
 			MIN_LINEAR_VEL = 0.02,
-			MIN_DIRECTION_MAG = 0.75, // refers to left joystick magnitude for choosing swerve direction
+			MIN_DIRECTION_MAG = 0.25, // refers to left joystick magnitude for choosing swerve direction
 			MAX_INDIVIDUAL_VELOCITY = 1.0;
 	
 	public static final double
@@ -37,19 +37,18 @@ public class DriveConstants {
 				Y_OFF = new double[] { -11.3, 11.3 , 11.3 , -11.3 };
 
 		public static final int[] OFFSETS = new int[] { 3721 , 767, 3402, 2527 };
-		
 	}
-
 
 	public static class PID_Constants {
 
 		public static final double[] 
 				ROTATION_P = new double[] {1.0, 1.0, 1.0, 1.0},//{ 0.91, 0.91, 0.91, 0.91 },
-				ROTATION_I = new double[] {700,700,700,700},//{ 0.023, 0.0025, 0.0025, 0.03 },
+				ROTATION_I = new double[] {0.001, 0.001, 0.001, 0.001},//{ 0.023, 0.0025, 0.0025, 0.03 },
 				ROTATION_D = new double[] { 0, 0, 0, 0 };
-		
+
 		public static final int[]
-				ROTATION_IZONE = new int[] { 15, 15, 15, 15 };
+				ROTATION_IZONE = new int[] { 500, 500, 500, 500 },
+				ROTATION_TOLERANCE = new int[] { 5, 5, 5, 5 };
 
 		// for turning robot to an angle
 		public static final double
@@ -59,9 +58,10 @@ public class DriveConstants {
 				GYRO_TOLERANCE = 5;
 		
 		public static final double
-			DRIFT_COMP_FAST_TARGET_P = 0.02,
-			DRIFT_COMP_FAST_TARGET_I = 0.0002,
-			DRIFT_COMP_FAST_TARGET_MAX = 0.3;
+			DRIFT_COMP_P = 0.075,
+			DRIFT_COMP_I = 0.0007,
+			DRIFT_COMP_MAX = 0.3;
 
 		}
+	
 }

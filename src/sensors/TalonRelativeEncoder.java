@@ -1,13 +1,13 @@
 package sensors;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 public class TalonRelativeEncoder extends RelativeEncoder {
-	private TalonSRX mTalon;
+	private WPI_TalonSRX mTalon;
 	private boolean mReversed;
 	
-	public TalonRelativeEncoder (TalonSRX pTalon, boolean pReversed, double pTicksToRPM) {
+	public TalonRelativeEncoder (WPI_TalonSRX pTalon, boolean pReversed, double pTicksToRPM) {
 		super(pTicksToRPM);
 		mTalon = pTalon;
 		mReversed = pReversed;

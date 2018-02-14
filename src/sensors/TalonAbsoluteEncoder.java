@@ -1,15 +1,13 @@
 package sensors;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import resource.ResourceFunctions;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 public class TalonAbsoluteEncoder extends RotationInputter {
-	TalonSRX mTalon;
+	WPI_TalonSRX mTalon;
 	
-	public TalonAbsoluteEncoder (TalonSRX pTalon, boolean pReverse, double pOffset) {
+	public TalonAbsoluteEncoder (WPI_TalonSRX pTalon, boolean pReverse, double pOffset) {
 		super(pReverse, pOffset);
 		mTalon = pTalon;
 		

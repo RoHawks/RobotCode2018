@@ -42,7 +42,7 @@ public abstract class RotationInputter implements PIDSource {
 	}
 
 	public double pidGet() {
-		return (getAngleDegrees());
+		return getAngleDegrees();
 	}
 
 	@Override

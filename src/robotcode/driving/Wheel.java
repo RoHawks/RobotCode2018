@@ -66,12 +66,11 @@ public class Wheel {
 			error = ResourceFunctions.continuousAngleDif(pTarget, realCurrent);
 		}
 
-		if (Math.abs(error) < 2) {
+/*		if (Math.abs(error) < 3) {
 			error = 0;
-		}
+		}*/
 
 		mTurn.set(ControlMode.Position, ResourceFunctions.angleToTick(current + error));
-		
 	}
 
 	public void setTurnSpeed(double pSpeed) {
