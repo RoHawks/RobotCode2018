@@ -55,7 +55,8 @@ public class DriveConstants {
 				GYRO_P = 0.0085, //8
 				GYRO_I = 0.0003,
 				GYRO_D = 0,
-				GYRO_TOLERANCE = 5;
+				GYRO_TOLERANCE = 5,
+				GYRO_MAX_SPEED = 0.7;
 		
 		public static final double
 			DRIFT_COMP_P = 0.075,

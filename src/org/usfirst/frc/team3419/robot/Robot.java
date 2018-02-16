@@ -107,18 +107,17 @@ public class Robot extends SampleRobot {
 		while (isOperatorControl() && isEnabled()) {
 			mIntake.setWheelSpeed();
 			SwerveDrive();
-			SmartDashboard.putNumber("i", mTurn[1].getIntegralAccumulator(0));
 			// TankDrive();	
 			// CrabDrive();
-	//			if(mPDP.getVoltage() < DriveConstants.EMERGENCY_VOLTAGE){
-	//				for(int i = 0; i < 4; i++){
-	//					mTurn[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-	//					mTurn[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
-	//					
-	//					mDrive[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
-	//					mDrive[i].configPeakOutputReverse(DriveConstants.MAX_EMERGENCY_VOLTAGE*-1, 10);
-	//				}
-	//			}
+			if (mPDP.getVoltage() < DriveConstants.EMERGENCY_VOLTAGE) {
+				for (int i = 0; i < 4; i++) {
+					mTurn[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+					mTurn[i].configPeakOutputReverse(-DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+
+					mDrive[i].configPeakOutputForward(DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+					mDrive[i].configPeakOutputReverse(-DriveConstants.MAX_EMERGENCY_VOLTAGE, 10);
+				}
+			}
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
