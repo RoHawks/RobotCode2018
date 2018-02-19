@@ -74,13 +74,14 @@ public class Robot extends SampleRobot {
 
 	public Robot() {
 	}
-
+	
 	@Override
 	public void robotInit() {
 		mNavX = new AHRS(Ports.NAVX);
 		mCompressor = new Compressor(Ports.COMPRESSOR);
+		mPDP = new PowerDistributionPanel();
 		DriveInit();
-		IntakeInit();
+		//IntakeInit();
 	}
 
 	/**
@@ -103,9 +104,9 @@ public class Robot extends SampleRobot {
 	 * Runs the motors with arcade steering.
 	 */
 	public void operatorControl() {
-		startGame();
+		//startGame();
 		while (isOperatorControl() && isEnabled()) {
-			mIntake.setWheelSpeed();
+			//mIntake.setWheelSpeed();
 			SwerveDrive();
 			// TankDrive();	
 			// CrabDrive();
@@ -122,7 +123,7 @@ public class Robot extends SampleRobot {
 		}
 	}
 
-	public void startGame() {
+	/*public void startGame() {
 		if (!mInGame) {
 			if (RunConstants.RUNNING_INTAKE) {
 				mIntake.enable();
@@ -136,20 +137,20 @@ public class Robot extends SampleRobot {
 			}
 			mInGame = true;
 		}
-	}
+	}*/
 	
-	public void endGame() {
+	/*public void endGame() {
 		if(mInGame){
 			mIntakeThread.interrupt();
 			mCompressor.stop();
 			mInGame = false;
 		}
-	}
+	}*/
 	
-	@Override
+	/*@Override
 	public void disabled(){
 		endGame();
-	}
+	}*/
 	
 	/**
 	 * Runs during test mode
@@ -170,7 +171,7 @@ public class Robot extends SampleRobot {
 		mDriveTrain.driveSwerve();
 	}
 
-	public void PneumaticsTest() {
+	/*public void PneumaticsTest() {
 		if (mController.getAButtonReleased()) {
 			mLeft.set(IntakeConstants.CLOSED);
 			mRight.set(IntakeConstants.CLOSED);
@@ -188,7 +189,7 @@ public class Robot extends SampleRobot {
 		SmartDashboard.putString("Left", mLeft.get().toString());
 		SmartDashboard.putBoolean("Limit Switch", mLimitSwitch.get());
 		SmartDashboard.putBoolean("Break Beam", mBreakbeam.get());
-	}
+	}*/
 
 	public void DriveInit(){
 		for (int i = 0; i < 4; i++) {
@@ -211,20 +212,19 @@ public class Robot extends SampleRobot {
 	
 			mEncoder[i] = new TalonAbsoluteEncoder(mTurn[i], DriveConstants.Modules.ENCODER_REVERSED[i],
 					ResourceFunctions.tickToAngle(DriveConstants.Modules.OFFSETS[i]));
-			// Offset needs to be in degrees
-			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i], DriveConstants.Modules.TURN_INVERTED[i]);
+			mWheel[i] = new Wheel(mTurn[i], mDrive[i], mEncoder[i]);
 		}
 		mRobotAngle = new RobotAngle(mNavX, false, 0);
 		mDriveTrain = new DriveTrain(mWheel, mController, mRobotAngle);
 	}
 
-	public void IntakeInit(){
+/*	public void IntakeInit(){
 		mLimitSwitch = new DigitalInput(Ports.LIMITSWITCH);
 		mBreakbeam = new DigitalInput(Ports.BREAKBEAM);
 		mLeft = new DoubleSolenoidReal(Ports.LEFT_INTAKE_IN, Ports.LEFT_INTAKE_OUT);
 		mRight = new DoubleSolenoidReal(Ports.RIGHT_INTAKE_IN, Ports.RIGHT_INTAKE_OUT);
 		mIntakeTalon = new WPI_TalonSRX(Ports.INTAKE);
 		mIntake = new Intake(mIntakeTalon, mLeft, mRight, mLimitSwitch, mBreakbeam, mJoystick);
-	}
+	}*/
 
 }

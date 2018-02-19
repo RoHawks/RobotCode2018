@@ -28,9 +28,9 @@ public class DriveConstants {
 
 	public static class Modules{
 		public static final boolean[]
-				TURN_INVERTED = new boolean[] {false, false, false, true},
-				INVERTED = new boolean[] { false, false, false, false },
-				ENCODER_REVERSED = new boolean[] {true, true, true, false};
+				TURN_INVERTED = new boolean[] {false,false,true,false}, //old values {false, false, false, true}
+				INVERTED = new boolean[] {true,true,false,false}, //assuming this is DRIVE_REVERSED old values { false, false, false, false }
+				ENCODER_REVERSED = new boolean[] {true, true, false, true}; //old values {true, true, true, false}
 		
 		public static final double[] 
 				X_OFF = new double[] { -12.0, -12.0 , 12.0 , 12.0 },

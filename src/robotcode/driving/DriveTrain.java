@@ -125,7 +125,8 @@ public class DriveTrain {
 				mWheels[i].set(robotDirectionAngle, 0);
 				resetDriftCompensation();
 				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
-			} else if (mRotationalVel == RotationalVelocity.NONE && mLinearVel == LinearVelocity.NONE) {
+			}
+			else if (mRotationalVel == RotationalVelocity.NONE && mLinearVel == LinearVelocity.NONE) {
 				if (mPrevLinearVel == LinearVelocity.NUDGE) {
 					mWheels[i].set(mSwerveDrive.getOutput(i).getAngle(), 0);
 				} else {
@@ -134,13 +135,14 @@ public class DriveTrain {
 				}
 				resetDriftCompensation();
 				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
-			} else if (mRotationalVel == RotationalVelocity.NONE
-					&& (mLinearVel == LinearVelocity.NORMAL || mLinearVel == LinearVelocity.NUDGE)) {
+			}
+			else if (mRotationalVel == RotationalVelocity.NONE && (mLinearVel == LinearVelocity.NORMAL || mLinearVel == LinearVelocity.NUDGE)) {
 				mDriftCompensationPID.enable();
 				SmartDashboard.putNumber("drift comp", mDriftCompensationOutput.getVal());
 				mSwerveDrive.calculateHoldDirection(mDriftCompensationOutput.getVal(), getDesiredRobotVel());
 				mWheels[i].set(mSwerveDrive.getOutput(i));
-			} else {
+			}
+			else {
 				resetDriftCompensation();
 				mDriftCompensationPID.setSetpoint(mRobotAngle.getAngleDegrees());
 				mSwerveDrive.calculate(getDesiredAngularVel(), getDesiredRobotVel());

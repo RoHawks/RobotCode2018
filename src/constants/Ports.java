@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj.SerialPort.Port;
 public class Ports {
 	
 	public static final int[] 
-		TURN = new int[] { 0, 2, 4, 6 },
-		DRIVE = new int[] { 1, 3, 5, 7 }; //SW, SE, NE, NW
+		TURN = new int[] {6, 1, 3, 11}, // old values { 0, 2, 4, 6 }
+		DRIVE = new int[] {8, 7, 5, 13}; //SW, SE, NE, NW old values { 1, 3, 5, 7 }
 	
-	public static final int INTAKE = 8;		
+	public static final int INTAKE = 16;		
 	
 	public static final int 
 		LIMITSWITCH = 1,

@@ -15,7 +15,7 @@ public class Wheel {
 	private WPI_TalonSRX mDrive;
 	private TalonAbsoluteEncoder mEncoder;
 	
-	public Wheel(WPI_TalonSRX pTurn, WPI_TalonSRX pDrive, TalonAbsoluteEncoder pEncoder, boolean pTurnInverted) {
+	public Wheel(WPI_TalonSRX pTurn, WPI_TalonSRX pDrive, TalonAbsoluteEncoder pEncoder) {
 		mTurn = pTurn;
 		mDrive = pDrive;
 		mEncoder = pEncoder;
